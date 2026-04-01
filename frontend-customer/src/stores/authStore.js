@@ -17,9 +17,9 @@ export const useAuthStore = defineStore('auth', {
     async login(storeCode, tableNo, password) {
       const data = await authService.loginTable(storeCode, tableNo, password)
       this.token = data.access_token
-      this.storeId = data.store_id
-      this.tableId = data.table_id
-      this.sessionId = data.session_id
+      this.storeId = data.table.store_id
+      this.tableId = data.table.id
+      this.sessionId = data.table.session_id
       this.storeCode = storeCode
       this.tableNo = tableNo
       localStorage.setItem('token', data.access_token)
