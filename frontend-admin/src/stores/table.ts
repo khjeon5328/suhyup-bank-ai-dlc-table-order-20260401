@@ -28,15 +28,14 @@ export const useTableStore = defineStore('table', () => {
   }
 
   async function endSession(storeId: number, tableId: number): Promise<void> {
-    await tableApi.endSession(storeId, tableId)
     const table = tables.value.find((t) => t.tableId === tableId)
-    if (table) {
-      table.hasActiveSession = false
-      table.totalOrderAmount = 0
-      table.orderCount = 0
-      table.latestOrders = []
-      table.statusSummary = { pending: 0, preparing: 0, completed: 0 }
-    }
+    if (!table) return
+    await tableApi.endSession(storeId, table.tableNumber)
+    table.hasActiveSession = false
+    table.totalOrderAmount = 0
+    table.orderCount = 0
+    table.latestOrders = []
+    table.statusSummary = { pending: 0, preparing: 0, completed: 0 }
   }
 
   function markAsRead(tableId: number): void {

@@ -27,9 +27,11 @@ class SSEService {
     if (!this.storeId) return
 
     const baseUrl = import.meta.env.VITE_SSE_BASE_URL
-    this.eventSource = new EventSource(`${baseUrl}/${this.storeId}/events`, {
-      withCredentials: true,
-    })
+    const token = this.getToken()
+    const url = token
+      ? `${baseUrl}/${this.storeId}/events/admin?token=${token}`
+      : `${baseUrl}/${this.storeId}/events/admin`
+    this.eventSource = new EventSource(url)
 
     this.eventSource.onopen = () => {
       this._status = 'connected'
@@ -79,6 +81,16 @@ class SSEService {
     this._status = 'disconnected'
     this.storeId = null
     this.retryCount = 0
+  }
+
+  private getToken(): string | null {
+    try {
+      const { useAuthStore } = require('@/stores/auth')
+      const authStore = useAuthStore()
+      return authStore.accessToken || null
+    } catch {
+      return null
+    }
   }
 
   onEvent(type: SSEEventType | '*', handler: SSEHandler): void {

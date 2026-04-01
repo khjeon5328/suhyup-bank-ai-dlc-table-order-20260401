@@ -21,7 +21,7 @@ export const menuApi = {
   },
 
   updateMenu(storeId: number, menuId: number, data: MenuUpdateRequest): Promise<ApiResponse<Menu>> {
-    return apiClient.patch(`/stores/${storeId}/menus/${menuId}`, data).then((res) => res.data)
+    return apiClient.put(`/stores/${storeId}/menus/${menuId}`, data).then((res) => res.data)
   },
 
   deleteMenu(storeId: number, menuId: number): Promise<ApiResponse<null>> {
@@ -33,22 +33,22 @@ export const menuApi = {
   },
 
   getCategories(storeId: number): Promise<ApiResponse<Category[]>> {
-    return apiClient.get(`/stores/${storeId}/categories`).then((res) => res.data)
+    return apiClient.get(`/stores/${storeId}/menus/categories`).then((res) => res.data)
   },
 
   createCategory(storeId: number, data: CategoryCreateRequest): Promise<ApiResponse<Category>> {
-    return apiClient.post(`/stores/${storeId}/categories`, data).then((res) => res.data)
+    return apiClient.post(`/stores/${storeId}/menus/categories`, data).then((res) => res.data)
   },
 
   updateCategory(storeId: number, categoryId: number, data: CategoryUpdateRequest): Promise<ApiResponse<Category>> {
-    return apiClient.patch(`/stores/${storeId}/categories/${categoryId}`, data).then((res) => res.data)
+    return apiClient.put(`/stores/${storeId}/menus/categories/${categoryId}`, data).then((res) => res.data)
   },
 
   deleteCategory(storeId: number, categoryId: number): Promise<ApiResponse<null>> {
-    return apiClient.delete(`/stores/${storeId}/categories/${categoryId}`).then((res) => res.data)
+    return apiClient.delete(`/stores/${storeId}/menus/categories/${categoryId}`).then((res) => res.data)
   },
 
   updateCategoryOrder(storeId: number, updates: CategoryOrderUpdate[]): Promise<ApiResponse<null>> {
-    return apiClient.put(`/stores/${storeId}/categories/order`, { updates }).then((res) => res.data)
+    return apiClient.put(`/stores/${storeId}/menus/categories/order`, { updates }).then((res) => res.data)
   },
 }
