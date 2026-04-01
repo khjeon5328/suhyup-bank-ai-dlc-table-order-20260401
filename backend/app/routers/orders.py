@@ -15,7 +15,7 @@ from app.services.order_service import OrderService
 router = APIRouter()
 
 
-@router.get("/", response_model=List[OrderResponse])
+@router.get("", response_model=List[OrderResponse])
 async def get_orders(
     store_code: str = Depends(verify_store_access),
     user: TokenPayload = Depends(get_current_user),
@@ -27,7 +27,7 @@ async def get_orders(
     return await service.get_orders_by_store(store_code)
 
 
-@router.post("/", response_model=OrderResponse, status_code=201)
+@router.post("", response_model=OrderResponse, status_code=201)
 async def create_order(
     data: OrderCreate,
     store_code: str = Depends(verify_store_access),

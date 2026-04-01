@@ -34,12 +34,12 @@ async def delete_category(category_id: int, store_code: str = Depends(verify_sto
     await MenuService(db).delete_category(store_code, category_id)
 
 
-@router.get("/", response_model=List[MenuResponse])
+@router.get("", response_model=List[MenuResponse])
 async def get_menus(category_id: Optional[int] = Query(None), store_code: str = Depends(verify_store_access), db: AsyncSession = Depends(get_db_session)):
     return await MenuService(db).get_menus(store_code, category_id)
 
 
-@router.post("/", response_model=MenuResponse, status_code=201)
+@router.post("", response_model=MenuResponse, status_code=201)
 async def create_menu(data: MenuCreate, store_code: str = Depends(verify_store_access), user: TokenPayload = Depends(require_owner), db: AsyncSession = Depends(get_db_session)):
     return await MenuService(db).create_menu(store_code, data)
 

@@ -16,7 +16,7 @@ from app.services.table_service import TableService
 router = APIRouter()
 
 
-@router.get("/", response_model=List[TableResponse])
+@router.get("", response_model=List[TableResponse])
 async def get_tables(
     store_code: str = Depends(verify_store_access),
     user: TokenPayload = Depends(require_admin),
@@ -27,7 +27,7 @@ async def get_tables(
     return [TableResponse.model_validate(t) for t in tables]
 
 
-@router.post("/", response_model=TableSetupResponse, status_code=201)
+@router.post("", response_model=TableSetupResponse, status_code=201)
 async def setup_table(
     data: TableCreate,
     store_code: str = Depends(verify_store_access),

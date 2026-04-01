@@ -14,12 +14,12 @@ from app.services.user_service import UserService
 router = APIRouter()
 
 
-@router.get("/", response_model=List[UserResponse])
+@router.get("", response_model=List[UserResponse])
 async def get_users(store_code: str = Depends(verify_store_access), user: TokenPayload = Depends(require_owner), db: AsyncSession = Depends(get_db_session)):
     return await UserService(db).get_users(store_code)
 
 
-@router.post("/", response_model=UserResponse, status_code=201)
+@router.post("", response_model=UserResponse, status_code=201)
 async def create_user(data: UserCreate, store_code: str = Depends(verify_store_access), user: TokenPayload = Depends(require_owner), db: AsyncSession = Depends(get_db_session)):
     return await UserService(db).create_user(store_code, data)
 

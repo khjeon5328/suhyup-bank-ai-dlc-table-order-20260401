@@ -1,0 +1,71 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: table-order-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: tableorder
+      MYSQL_USER: tableorder
+      MYSQL_PASSWORD: tableorder
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  db-migrate:
+    build: ./table-order/database
+    container_name: table-order-migrate
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+      DB_NAME: tableorder
+    command: >
+      sh -c "python -m alembic upgrade head && python -m seed.run_seed_standalone"
+    restart: "no"
+
+  backend:
+    build: ./backend
+    container_name: table-order-backend
+    depends_on:
+      db-migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: mysql+aiomysql://root:rootpassword@mysql:3306/tableorder
+      JWT_SECRET_KEY: docker-secret-key-table-order
+      JWT_ALGORITHM: HS256
+      JWT_ADMIN_EXPIRE_HOURS: 16
+      CORS_ORIGINS: '["http://localhost:3000","http://localhost:3001"]'
+      LOG_LEVEL: INFO
+      ENVIRONMENT: development
+    ports:
+      - "8000:8000"
+
+  frontend-customer:
+    build: ./frontend-customer
+    container_name: table-order-customer
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+  frontend-admin:
+    build: ./frontend-admin
+    container_name: table-order-admin
+    depends_on:
+      - backend
+    ports:
+      - "3001:80"
+
+volumes:
+  mysql_data:

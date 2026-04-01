@@ -15,6 +15,7 @@ from app.repositories.session_repo import SessionRepository
 from app.repositories.store_repo import StoreRepository
 from app.repositories.table_repo import TableRepository
 from app.repositories.user_repo import UserRepository
+from app.models.table_session import TableSession
 from app.schemas.auth import (
     AdminLoginResponse,
     TableInfo,
@@ -69,7 +70,10 @@ class AuthService:
 
         session = await self.session_repo.get_active(store_code, table_no)
         if not session:
-            raise InvalidCredentialsException("활성 세션이 없습니다.")
+            session = await self.session_repo.create(
+                TableSession(store_code=store_code, table_no=table_no)
+            )
+            await self.db.commit()
 
         token = create_access_token(
             data={
