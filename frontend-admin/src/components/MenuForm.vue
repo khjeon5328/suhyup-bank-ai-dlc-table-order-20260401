@@ -39,7 +39,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { menuService } from '../services/menuService'
+import { menuService } from '@/services/menuService'
 const props = defineProps({ menu: Object, categories: Array, storeCode: String })
 const emit = defineEmits(['close', 'saved'])
 const form = ref({ name: '', price: 0, category_id: null, description: '', image_url: '' })

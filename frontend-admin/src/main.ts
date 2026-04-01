@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { createI18n } from 'vue-i18n'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
@@ -19,7 +20,10 @@ const i18n = createI18n({
 
 const app = createApp(App)
 
-app.use(createPinia())
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
+
+app.use(pinia)
 app.use(router)
 app.use(i18n)
 app.use(ElementPlus)

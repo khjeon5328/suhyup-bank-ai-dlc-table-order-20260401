@@ -25,9 +25,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useAuthStore } from '../stores/authStore'
-import { userService } from '../services/userService'
-import UserForm from '../components/UserForm.vue'
+import { useAuthStore } from '@/stores/authStore'
+import { userService } from '@/services/userService'
+import UserForm from '@/components/UserForm.vue'
 const auth = useAuthStore()
 const users = ref([]); const loading = ref(false); const showForm = ref(false); const editingUser = ref(null)
 

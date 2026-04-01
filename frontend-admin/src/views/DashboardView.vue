@@ -18,13 +18,13 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useAuthStore } from '../stores/authStore'
-import { useOrderStore } from '../stores/orderStore'
-import { tableService } from '../services/tableService'
-import TableCard from '../components/TableCard.vue'
-import OrderDetailModal from '../components/OrderDetailModal.vue'
-import OrderHistoryModal from '../components/OrderHistoryModal.vue'
-import ConfirmDialog from '../components/ConfirmDialog.vue'
+import { useAuthStore } from '@/stores/authStore'
+import { useOrderStore } from '@/stores/orderStore'
+import { tableService } from '@/services/tableService'
+import TableCard from '@/components/TableCard.vue'
+import OrderDetailModal from '@/components/OrderDetailModal.vue'
+import OrderHistoryModal from '@/components/OrderHistoryModal.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 
 const auth = useAuthStore()
 const orderStore = useOrderStore()
