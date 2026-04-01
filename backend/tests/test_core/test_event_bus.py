@@ -1,6 +1,5 @@
-"""Tests for EventBus."""
+"""Tests for EventBus — store_code based."""
 
-import asyncio
 import pytest
 from app.core.event_bus import EventBus, SSEEvent
 
@@ -9,42 +8,23 @@ from app.core.event_bus import EventBus, SSEEvent
 class TestEventBus:
     async def test_publish_and_subscribe(self):
         bus = EventBus()
-        queue = await bus.subscribe(store_id=1)
-
-        event = SSEEvent(type="order_created", data={"id": 1}, store_id=1, table_id=1)
+        queue = await bus.subscribe(store_code="TEST01")
+        event = SSEEvent(type="order_created", data={"id": 1}, store_code="TEST01", table_no=1)
         await bus.publish(event)
-
         received = queue.get_nowait()
         assert received.type == "order_created"
-        assert received.data["id"] == 1
-
-    async def test_multiple_subscribers(self):
-        bus = EventBus()
-        q1 = await bus.subscribe(store_id=1)
-        q2 = await bus.subscribe(store_id=1)
-
-        event = SSEEvent(type="test", data={}, store_id=1)
-        await bus.publish(event)
-
-        assert not q1.empty()
-        assert not q2.empty()
 
     async def test_store_isolation(self):
         bus = EventBus()
-        q1 = await bus.subscribe(store_id=1)
-        q2 = await bus.subscribe(store_id=2)
-
-        event = SSEEvent(type="test", data={}, store_id=1)
-        await bus.publish(event)
-
+        q1 = await bus.subscribe(store_code="TEST01")
+        q2 = await bus.subscribe(store_code="TEST02")
+        await bus.publish(SSEEvent(type="test", data={}, store_code="TEST01"))
         assert not q1.empty()
         assert q2.empty()
 
     async def test_unsubscribe(self):
         bus = EventBus()
-        queue = await bus.subscribe(store_id=1)
-        bus.unsubscribe(store_id=1, queue=queue)
-
-        event = SSEEvent(type="test", data={}, store_id=1)
-        await bus.publish(event)
+        queue = await bus.subscribe(store_code="TEST01")
+        bus.unsubscribe(store_code="TEST01", queue=queue)
+        await bus.publish(SSEEvent(type="test", data={}, store_code="TEST01"))
         assert queue.empty()

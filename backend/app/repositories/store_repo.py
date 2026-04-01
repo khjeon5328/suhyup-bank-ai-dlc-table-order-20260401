@@ -1,4 +1,4 @@
-"""Store repository."""
+"""Store repository — synced with Unit 1."""
 
 from typing import Optional
 
@@ -12,10 +12,8 @@ class StoreRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_by_id(self, store_id: int) -> Optional[Store]:
-        result = await self.db.execute(select(Store).where(Store.id == store_id, Store.is_active == True))
-        return result.scalar_one_or_none()
-
-    async def get_by_code(self, code: str) -> Optional[Store]:
-        result = await self.db.execute(select(Store).where(Store.code == code, Store.is_active == True))
+    async def get_by_code(self, store_code: str) -> Optional[Store]:
+        result = await self.db.execute(
+            select(Store).where(Store.store_code == store_code)
+        )
         return result.scalar_one_or_none()

@@ -1,4 +1,4 @@
-"""Menu and Category schemas."""
+"""Menu and Category schemas — synced with Unit 1."""
 
 from datetime import datetime
 from typing import List, Optional
@@ -6,7 +6,6 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
-# Category
 class CategoryCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=50)
 
@@ -18,15 +17,13 @@ class CategoryUpdate(BaseModel):
 
 class CategoryResponse(BaseModel):
     id: int
-    store_id: int
+    store_code: str
     name: str
     sort_order: int
-    is_active: bool
 
     model_config = {"from_attributes": True}
 
 
-# Menu
 class MenuCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     price: int = Field(..., ge=0)
@@ -46,14 +43,13 @@ class MenuUpdate(BaseModel):
 
 class MenuResponse(BaseModel):
     id: int
-    store_id: int
+    store_code: str
     category_id: int
     name: str
     price: int
     description: Optional[str] = None
     image_url: Optional[str] = None
     sort_order: int
-    is_active: bool
     created_at: datetime
 
     model_config = {"from_attributes": True}

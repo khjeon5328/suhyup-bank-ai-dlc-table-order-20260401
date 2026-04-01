@@ -1,4 +1,4 @@
-"""SSE events router — admin and table event streams."""
+"""SSE events router."""
 
 from fastapi import APIRouter, Depends, Request
 from starlette.responses import StreamingResponse
@@ -13,31 +13,29 @@ router = APIRouter()
 @router.get("/admin")
 async def admin_sse_stream(
     request: Request,
-    store_id: int = Depends(verify_store_access),
+    store_code: str = Depends(verify_store_access),
     user: TokenPayload = Depends(require_admin),
     manager: SSEManager = Depends(get_sse_manager),
 ):
     async def event_generator():
-        async for event_str in manager.stream_admin(store_id):
+        async for event_str in manager.stream_admin(store_code):
             if await request.is_disconnected():
                 break
             yield event_str
-
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 
-@router.get("/table/{table_id}")
+@router.get("/table/{table_no}")
 async def table_sse_stream(
-    table_id: int,
+    table_no: int,
     request: Request,
-    store_id: int = Depends(verify_store_access),
+    store_code: str = Depends(verify_store_access),
     user: TokenPayload = Depends(require_table),
     manager: SSEManager = Depends(get_sse_manager),
 ):
     async def event_generator():
-        async for event_str in manager.stream_table(store_id, table_id):
+        async for event_str in manager.stream_table(store_code, table_no):
             if await request.is_disconnected():
                 break
             yield event_str
-
     return StreamingResponse(event_generator(), media_type="text/event-stream")

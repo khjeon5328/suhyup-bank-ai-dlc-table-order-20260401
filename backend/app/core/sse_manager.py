@@ -1,4 +1,4 @@
-"""SSE connection manager with event filtering."""
+"""SSE connection manager — synced with Unit 1 (store_code based)."""
 
 import json
 from typing import AsyncGenerator, Optional
@@ -10,28 +10,24 @@ class SSEManager:
     def __init__(self, bus: Optional[EventBus] = None):
         self._event_bus = bus or default_event_bus
 
-    async def stream_admin(self, store_id: int) -> AsyncGenerator[str, None]:
-        """Admin SSE stream — receives all store events."""
-        queue = await self._event_bus.subscribe(store_id)
+    async def stream_admin(self, store_code: str) -> AsyncGenerator[str, None]:
+        queue = await self._event_bus.subscribe(store_code)
         try:
             while True:
                 event: SSEEvent = await queue.get()
                 yield self._format_sse(event)
         finally:
-            self._event_bus.unsubscribe(store_id, queue)
+            self._event_bus.unsubscribe(store_code, queue)
 
-    async def stream_table(
-        self, store_id: int, table_id: int
-    ) -> AsyncGenerator[str, None]:
-        """Table SSE stream — receives only events for this table."""
-        queue = await self._event_bus.subscribe(store_id)
+    async def stream_table(self, store_code: str, table_no: int) -> AsyncGenerator[str, None]:
+        queue = await self._event_bus.subscribe(store_code)
         try:
             while True:
                 event: SSEEvent = await queue.get()
-                if event.table_id == table_id or event.table_id is None:
+                if event.table_no == table_no or event.table_no is None:
                     yield self._format_sse(event)
         finally:
-            self._event_bus.unsubscribe(store_id, queue)
+            self._event_bus.unsubscribe(store_code, queue)
 
     @staticmethod
     def _format_sse(event: SSEEvent) -> str:

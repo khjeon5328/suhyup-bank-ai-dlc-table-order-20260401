@@ -1,6 +1,6 @@
-"""TableSession repository."""
+"""TableSession repository — synced with Unit 1."""
 
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import select
@@ -19,14 +19,17 @@ class SessionRepository:
         await self.db.refresh(session)
         return session
 
-    async def get_active(self, table_id: int) -> Optional[TableSession]:
+    async def get_active(self, store_code: str, table_no: int) -> Optional[TableSession]:
         result = await self.db.execute(
-            select(TableSession).where(TableSession.table_id == table_id, TableSession.is_active == True)
+            select(TableSession).where(
+                TableSession.store_code == store_code,
+                TableSession.table_no == table_no,
+                TableSession.ended_at.is_(None),
+            )
         )
         return result.scalar_one_or_none()
 
     async def deactivate(self, session: TableSession) -> TableSession:
-        session.is_active = False
-        session.ended_at = datetime.now(timezone.utc)
+        session.ended_at = datetime.utcnow()
         await self.db.flush()
         return session

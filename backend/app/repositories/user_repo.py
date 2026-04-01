@@ -1,4 +1,4 @@
-"""User repository."""
+"""User repository — synced with Unit 1."""
 
 from typing import List, Optional
 
@@ -18,26 +18,32 @@ class UserRepository:
         await self.db.refresh(user)
         return user
 
-    async def get_by_id(self, store_id: int, user_id: int) -> Optional[User]:
+    async def get_by_id(self, store_code: str, user_id: int) -> Optional[User]:
         result = await self.db.execute(
-            select(User).where(User.id == user_id, User.store_id == store_id, User.is_active == True)
+            select(User).where(
+                User.id == user_id, User.store_code == store_code, User.deleted_at.is_(None)
+            )
         )
         return result.scalar_one_or_none()
 
-    async def get_by_username(self, store_id: int, username: str) -> Optional[User]:
+    async def get_by_username(self, store_code: str, username: str) -> Optional[User]:
         result = await self.db.execute(
-            select(User).where(User.store_id == store_id, User.username == username, User.is_active == True)
+            select(User).where(
+                User.store_code == store_code, User.username == username, User.deleted_at.is_(None)
+            )
         )
         return result.scalar_one_or_none()
 
-    async def get_by_store(self, store_id: int) -> List[User]:
+    async def get_by_store(self, store_code: str) -> List[User]:
         result = await self.db.execute(
-            select(User).where(User.store_id == store_id, User.is_active == True)
+            select(User).where(User.store_code == store_code, User.deleted_at.is_(None))
         )
         return list(result.scalars().all())
 
-    async def count_owners(self, store_id: int) -> int:
+    async def count_owners(self, store_code: str) -> int:
         result = await self.db.execute(
-            select(func.count()).where(User.store_id == store_id, User.role == "owner", User.is_active == True)
+            select(func.count()).where(
+                User.store_code == store_code, User.role == "owner", User.deleted_at.is_(None)
+            )
         )
         return result.scalar_one()

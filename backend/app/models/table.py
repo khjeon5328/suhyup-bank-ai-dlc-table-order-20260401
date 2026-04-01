@@ -1,29 +1,19 @@
-"""Table model."""
+"""RestaurantTable model — synced with Unit 1."""
 
-from datetime import datetime, timezone
-
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import Base
+from app.models.base import Base, TimestampMixin
 
 
-class Table(Base):
-    __tablename__ = "tables"
-    __table_args__ = (UniqueConstraint("store_id", "table_no", name="uq_table_store_no"),)
+class RestaurantTable(TimestampMixin, Base):
+    __tablename__ = "restaurant_table"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    store_id: Mapped[int] = mapped_column(Integer, ForeignKey("stores.id"), nullable=False)
-    table_no: Mapped[int] = mapped_column(Integer, nullable=False)
+    store_code: Mapped[str] = mapped_column(
+        String(20), ForeignKey("store.store_code", ondelete="RESTRICT"), primary_key=True,
+    )
+    table_no: Mapped[int] = mapped_column(Integer, primary_key=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
-    )
 
     store = relationship("Store", back_populates="tables")
     sessions = relationship("TableSession", back_populates="table", lazy="selectin")

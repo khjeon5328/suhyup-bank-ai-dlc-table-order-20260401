@@ -1,29 +1,32 @@
-"""User (admin account) model."""
+"""User model — synced with Unit 1."""
 
-from datetime import datetime, timezone
+import enum
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import Enum, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import Base
+from app.models.base import Base, SoftDeleteMixin, TimestampMixin
 
 
-class User(Base):
-    __tablename__ = "users"
-    __table_args__ = (UniqueConstraint("store_id", "username", name="uq_user_store_username"),)
+class UserRole(str, enum.Enum):
+    OWNER = "owner"
+    MANAGER = "manager"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    store_id: Mapped[int] = mapped_column(Integer, ForeignKey("stores.id"), nullable=False)
+
+class User(TimestampMixin, SoftDeleteMixin, Base):
+    __tablename__ = "user"
+    __table_args__ = (
+        UniqueConstraint("store_code", "username", name="uq_user_store_username"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    store_code: Mapped[str] = mapped_column(
+        String(20), ForeignKey("store.store_code", ondelete="RESTRICT"), nullable=False,
+    )
     username: Mapped[str] = mapped_column(String(50), nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    role: Mapped[str] = mapped_column(String(20), nullable=False)  # owner, manager
-    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
+    role: Mapped[UserRole] = mapped_column(
+        Enum(UserRole, values_callable=lambda x: [e.value for e in x]), nullable=False,
     )
 
     store = relationship("Store", back_populates="users")

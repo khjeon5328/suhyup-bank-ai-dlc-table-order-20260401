@@ -1,4 +1,4 @@
-"""Tests for user router."""
+"""Tests for user router — store_code based."""
 
 import pytest
 import pytest_asyncio
@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import hash_password
 from app.models.store import Store
-from app.models.user import User
+from app.models.user import User, UserRole
 from tests.conftest import make_manager_token, make_owner_token
 
 
@@ -15,30 +15,22 @@ from tests.conftest import make_manager_token, make_owner_token
 class TestUserRouter:
     @pytest_asyncio.fixture
     async def seed_data(self, db_session: AsyncSession):
-        store = Store(name="테스트매장", code="TEST01")
+        store = Store(store_code="TEST01", name="테스트매장")
         db_session.add(store)
         await db_session.flush()
-        user = User(store_id=store.id, username="owner1", password_hash=hash_password("pw"), role="owner")
+        user = User(store_code="TEST01", username="owner1", password_hash=hash_password("pw"), role=UserRole.OWNER)
         db_session.add(user)
         await db_session.commit()
         return store, user
 
     async def test_create_user(self, client: AsyncClient, seed_data):
-        store, user = seed_data
-        token = make_owner_token(user_id=user.id, store_id=store.id)
-        resp = await client.post(
-            f"/api/v1/stores/{store.id}/users",
-            json={"username": "manager1", "password": "password123", "role": "manager"},
-            headers={"Authorization": f"Bearer {token}"},
-        )
+        _, user = seed_data
+        token = make_owner_token(user_id=user.id, store_code="TEST01")
+        resp = await client.post("/api/v1/stores/TEST01/users", json={"username": "manager1", "password": "password123", "role": "manager"}, headers={"Authorization": f"Bearer {token}"})
         assert resp.status_code == 201
         assert resp.json()["username"] == "manager1"
 
     async def test_manager_cannot_manage_users(self, client: AsyncClient, seed_data):
-        store, _ = seed_data
-        token = make_manager_token(store_id=store.id)
-        resp = await client.get(
-            f"/api/v1/stores/{store.id}/users",
-            headers={"Authorization": f"Bearer {token}"},
-        )
+        token = make_manager_token(store_code="TEST01")
+        resp = await client.get("/api/v1/stores/TEST01/users", headers={"Authorization": f"Bearer {token}"})
         assert resp.status_code == 403

@@ -1,4 +1,4 @@
-"""Store schemas."""
+"""Store schemas — synced with Unit 1."""
 
 from typing import Optional
 
@@ -6,9 +6,8 @@ from pydantic import BaseModel
 
 
 class StoreResponse(BaseModel):
-    id: int
+    store_code: str
     name: str
-    code: str
     address: Optional[str] = None
     phone: Optional[str] = None
 

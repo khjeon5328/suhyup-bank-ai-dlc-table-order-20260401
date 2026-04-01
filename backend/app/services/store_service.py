@@ -1,4 +1,4 @@
-"""Store service."""
+"""Store service — synced with Unit 1."""
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,8 +11,8 @@ class StoreService:
     def __init__(self, db: AsyncSession):
         self.store_repo = StoreRepository(db)
 
-    async def get_store(self, store_id: int) -> Store:
-        store = await self.store_repo.get_by_id(store_id)
+    async def get_store(self, store_code: str) -> Store:
+        store = await self.store_repo.get_by_code(store_code)
         if not store:
             raise StoreNotFoundException()
         return store
