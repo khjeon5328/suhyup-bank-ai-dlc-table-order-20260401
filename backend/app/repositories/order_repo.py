@@ -1,9 +1,9 @@
-"""Order repository."""
+"""Order repository — synced with Unit 1."""
 
-from datetime import date, datetime, timezone
+from datetime import datetime
 from typing import List, Optional
 
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -20,11 +20,11 @@ class OrderRepository:
         await self.db.refresh(order)
         return order
 
-    async def get_by_id(self, store_id: int, order_id: int) -> Optional[Order]:
+    async def get_by_id(self, store_code: str, order_id: int) -> Optional[Order]:
         result = await self.db.execute(
             select(Order)
             .options(selectinload(Order.items))
-            .where(Order.id == order_id, Order.store_id == store_id, Order.is_deleted == False)
+            .where(Order.id == order_id, Order.store_code == store_code, Order.archived_at.is_(None))
         )
         return result.scalar_one_or_none()
 
@@ -32,29 +32,19 @@ class OrderRepository:
         result = await self.db.execute(
             select(Order)
             .options(selectinload(Order.items))
-            .where(Order.session_id == session_id, Order.is_deleted == False)
+            .where(Order.session_id == session_id, Order.archived_at.is_(None))
             .order_by(Order.created_at.desc())
         )
         return list(result.scalars().all())
 
-    async def get_by_store_active(self, store_id: int) -> List[Order]:
+    async def get_by_store_active(self, store_code: str) -> List[Order]:
         result = await self.db.execute(
             select(Order)
             .options(selectinload(Order.items))
-            .where(Order.store_id == store_id, Order.is_deleted == False)
+            .where(Order.store_code == store_code, Order.archived_at.is_(None))
             .order_by(Order.created_at.desc())
         )
         return list(result.scalars().all())
-
-    async def get_next_order_no(self, store_id: int, today: date) -> str:
-        result = await self.db.execute(
-            select(func.count()).where(
-                Order.store_id == store_id,
-                func.date(Order.created_at) == today,
-            )
-        )
-        count = result.scalar_one()
-        return str(count + 1).zfill(3)
 
     async def get_pending_by_session(self, session_id: int) -> List[Order]:
         result = await self.db.execute(
@@ -62,14 +52,13 @@ class OrderRepository:
             .options(selectinload(Order.items))
             .where(
                 Order.session_id == session_id,
-                Order.is_deleted == False,
+                Order.archived_at.is_(None),
                 Order.status.in_(["pending", "preparing"]),
             )
         )
         return list(result.scalars().all())
 
-    async def soft_delete(self, order: Order) -> Order:
-        order.is_deleted = True
-        order.deleted_at = datetime.now(timezone.utc)
+    async def archive(self, order: Order) -> Order:
+        order.archived_at = datetime.utcnow()
         await self.db.flush()
         return order

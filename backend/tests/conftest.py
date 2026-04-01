@@ -1,4 +1,4 @@
-"""Pytest fixtures for backend tests."""
+"""Pytest fixtures — synced with Unit 1."""
 
 import asyncio
 from collections.abc import AsyncGenerator
@@ -53,29 +53,26 @@ async def test_event_bus() -> EventBus:
 async def client(db_session: AsyncSession, test_event_bus: EventBus) -> AsyncGenerator[AsyncClient, None]:
     async def override_db():
         yield db_session
-
     def override_event_bus():
         return test_event_bus
 
     app.dependency_overrides[get_db_session] = override_db
     app.dependency_overrides[get_event_bus] = override_event_bus
-
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test", follow_redirects=True) as ac:
         yield ac
-
     app.dependency_overrides.clear()
 
 
-def make_owner_token(user_id: int = 1, store_id: int = 1) -> str:
-    return create_access_token(data={"user_id": user_id, "store_id": store_id, "role": "owner"})
+def make_owner_token(user_id: int = 1, store_code: str = "TEST01") -> str:
+    return create_access_token(data={"user_id": user_id, "store_code": store_code, "role": "owner"})
 
 
-def make_manager_token(user_id: int = 2, store_id: int = 1) -> str:
-    return create_access_token(data={"user_id": user_id, "store_id": store_id, "role": "manager"})
+def make_manager_token(user_id: int = 2, store_code: str = "TEST01") -> str:
+    return create_access_token(data={"user_id": user_id, "store_code": store_code, "role": "manager"})
 
 
-def make_table_token(table_id: int = 1, store_id: int = 1, session_id: int = 1) -> str:
+def make_table_token(table_no: int = 1, store_code: str = "TEST01", session_id: int = 1) -> str:
     return create_access_token(
-        data={"table_id": table_id, "store_id": store_id, "session_id": session_id, "role": "table"}
+        data={"table_no": table_no, "store_code": store_code, "session_id": session_id, "role": "table"}
     )

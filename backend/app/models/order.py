@@ -1,33 +1,50 @@
-"""Order model."""
+"""Order and OrderItem models — synced with Unit 1."""
 
-from datetime import datetime, timezone
-from typing import Optional
+import enum
+from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String
+from sqlalchemy import (
+    CheckConstraint, DateTime, Enum, ForeignKey, Integer, String, func,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import Base
+from app.models.base import Base, TimestampMixin
 
 
-class Order(Base):
-    __tablename__ = "orders"
+class OrderStatus(str, enum.Enum):
+    PENDING = "pending"
+    PREPARING = "preparing"
+    COMPLETED = "completed"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    store_id: Mapped[int] = mapped_column(Integer, ForeignKey("stores.id"), nullable=False)
-    table_id: Mapped[int] = mapped_column(Integer, ForeignKey("tables.id"), nullable=False)
-    session_id: Mapped[int] = mapped_column(Integer, ForeignKey("table_sessions.id"), nullable=False)
-    order_no: Mapped[str] = mapped_column(String(10), nullable=False)
-    total_amount: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
-    is_deleted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
+
+class Order(TimestampMixin, Base):
+    __tablename__ = "order"
+    __table_args__ = (
+        CheckConstraint("total_amount >= 0", name="ck_order_total_positive"),
     )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    store_code: Mapped[str] = mapped_column(
+        String(20), ForeignKey("store.store_code", ondelete="RESTRICT"), nullable=False,
+    )
+    table_no: Mapped[int] = mapped_column(Integer, nullable=False)
+    session_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("table_session.id", ondelete="RESTRICT"), nullable=False,
+    )
+    total_amount: Mapped[int] = mapped_column(Integer, nullable=False)
+    status: Mapped[OrderStatus] = mapped_column(
+        Enum(OrderStatus, values_callable=lambda x: [e.value for e in x]),
+        nullable=False, server_default="pending",
+    )
+    archived_at: Mapped[datetime | None] = mapped_column(
+        DateTime, nullable=True, default=None,
     )
 
     session = relationship("TableSession", back_populates="orders")
-    items = relationship("OrderItem", back_populates="order", lazy="selectin")
+    items = relationship(
+        "OrderItem", back_populates="order", lazy="selectin", cascade="all, delete-orphan",
+    )
+
+    @property
+    def is_archived(self) -> bool:
+        return self.archived_at is not None

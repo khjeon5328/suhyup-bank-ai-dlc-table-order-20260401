@@ -1,4 +1,4 @@
-"""Order schemas."""
+"""Order schemas — synced with Unit 1."""
 
 from datetime import datetime
 from typing import List, Optional
@@ -28,32 +28,17 @@ class OrderItemResponse(BaseModel):
 
 class OrderResponse(BaseModel):
     id: int
-    store_id: int
-    table_id: int
+    store_code: str
+    table_no: int
     session_id: int
-    order_no: str
     total_amount: int
     status: str
     items: List[OrderItemResponse] = []
     created_at: datetime
+    archived_at: Optional[datetime] = None
 
     model_config = {"from_attributes": True}
 
 
 class OrderStatusUpdate(BaseModel):
     status: str = Field(..., pattern="^(pending|preparing|completed)$")
-
-
-class OrderHistoryResponse(BaseModel):
-    id: int
-    store_id: int
-    table_id: int
-    original_order_id: int
-    order_no: str
-    order_data: dict
-    total_amount: int
-    status: str
-    ordered_at: datetime
-    archived_at: datetime
-
-    model_config = {"from_attributes": True}

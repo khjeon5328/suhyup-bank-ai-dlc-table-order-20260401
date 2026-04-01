@@ -1,4 +1,4 @@
-"""User schemas."""
+"""User schemas — synced with Unit 1."""
 
 from datetime import datetime
 from typing import Optional
@@ -20,10 +20,9 @@ class UserUpdate(BaseModel):
 
 class UserResponse(BaseModel):
     id: int
-    store_id: int
+    store_code: str
     username: str
     role: str
-    is_active: bool
     created_at: datetime
 
     model_config = {"from_attributes": True}

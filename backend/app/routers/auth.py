@@ -1,6 +1,6 @@
 """Auth router — POST /login/admin, POST /login/table."""
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db_session
@@ -13,12 +13,10 @@ router = APIRouter()
 @router.post("/login/admin", response_model=AdminLoginResponse)
 async def login_admin(
     data: AdminLoginRequest,
-    request: Request,
     db: AsyncSession = Depends(get_db_session),
 ):
     service = AuthService(db)
-    ip = request.client.host if request.client else "unknown"
-    return await service.login_admin(data.store_code, data.username, data.password, ip)
+    return await service.login_admin(data.store_code, data.username, data.password)
 
 
 @router.post("/login/table", response_model=TableLoginResponse)

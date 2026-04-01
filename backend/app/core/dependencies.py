@@ -1,4 +1,4 @@
-"""FastAPI dependency injection factories."""
+"""FastAPI dependency injection — synced with Unit 1 (store_code based)."""
 
 from typing import Optional
 
@@ -67,12 +67,12 @@ async def require_table(token: Optional[str] = Depends(oauth2_scheme)) -> TokenP
 
 
 async def verify_store_access(
-    store_id: int = Path(...),
+    store_code: str = Path(...),
     user: TokenPayload = Depends(get_current_user),
-) -> int:
-    if user.store_id != store_id:
+) -> str:
+    if user.store_code != store_code:
         raise ForbiddenException("매장 접근 권한이 없습니다.")
-    return store_id
+    return store_code
 
 
 def get_event_bus() -> EventBus:

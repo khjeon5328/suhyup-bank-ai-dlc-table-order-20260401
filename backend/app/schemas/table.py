@@ -1,7 +1,7 @@
-"""Table schemas."""
+"""Table schemas — synced with Unit 1."""
 
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -12,10 +12,8 @@ class TableCreate(BaseModel):
 
 
 class TableResponse(BaseModel):
-    id: int
-    store_id: int
+    store_code: str
     table_no: int
-    is_active: bool
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -23,13 +21,16 @@ class TableResponse(BaseModel):
 
 class SessionResponse(BaseModel):
     id: int
-    store_id: int
-    table_id: int
+    store_code: str
+    table_no: int
     started_at: datetime
     ended_at: Optional[datetime] = None
-    is_active: bool
 
     model_config = {"from_attributes": True}
+
+    @property
+    def is_active(self) -> bool:
+        return self.ended_at is None
 
 
 class TableSetupResponse(BaseModel):
@@ -45,8 +46,3 @@ class SessionEndResponse(BaseModel):
     old_session: SessionResponse
     new_session: SessionResponse
     archived_orders: int
-
-
-class PendingOrdersWarning(BaseModel):
-    warning: str
-    pending_orders: List[dict]
