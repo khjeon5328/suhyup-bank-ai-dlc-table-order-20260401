@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/authStore'
 import { useMenuStore } from '@/stores/menu'
 import { useConfirm } from '@/composables/useConfirm'
 import type { Category } from '@/types/menu'

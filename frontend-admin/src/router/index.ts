@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/authStore'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -30,6 +30,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/UserManageView.vue'),
         meta: { requiresOwner: true },
       },
+      {
+        path: 'tables',
+        name: 'TableManage',
+        component: () => import('@/views/TableManageView.vue'),
+      },
     ],
   },
 ]
@@ -46,7 +51,7 @@ router.beforeEach(async (to, _from, next) => {
 
   if (!isInitialized) {
     isInitialized = true
-    await authStore.initAuth()
+    // authStore uses pinia-plugin-persistedstate, state is auto-restored
   }
 
   if (to.path === '/login' && authStore.isAuthenticated) {

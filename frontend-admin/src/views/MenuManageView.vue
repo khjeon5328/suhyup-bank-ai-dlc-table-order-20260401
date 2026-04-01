@@ -28,9 +28,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useAuthStore } from '../stores/authStore'
-import { menuService } from '../services/menuService'
-import MenuForm from '../components/MenuForm.vue'
+import { useAuthStore } from '@/stores/authStore'
+import { menuService } from '@/services/menuService'
+import MenuForm from '@/components/MenuForm.vue'
 const auth = useAuthStore()
 const menus = ref([]); const categories = ref([]); const loading = ref(false)
 const showForm = ref(false); const editingMenu = ref(null)

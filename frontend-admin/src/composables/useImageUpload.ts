@@ -1,27 +1,23 @@
 import { ref } from 'vue'
-import { imageApi } from '@/services/imageApi'
-import { useAuthStore } from '@/stores/auth'
+import { imageService } from '@/services/imageService'
+import { useAuthStore } from '@/stores/authStore'
 
 export function useImageUpload() {
+  const authStore = useAuthStore()
   const uploading = ref(false)
-  const imageUrl = ref<string | null>(null)
+  const imageUrl = ref('')
 
-  async function upload(file: File): Promise<string | null> {
-    const authStore = useAuthStore()
-    if (!authStore.storeId) return null
-
+  async function uploadImage(file: File): Promise<string> {
     uploading.value = true
     try {
-      const response = await imageApi.getPresignedUrl(authStore.storeId, file.name)
-      await imageApi.uploadToS3(response.data.uploadUrl, file)
-      imageUrl.value = response.data.imageUrl
-      return response.data.imageUrl
-    } catch {
-      return null
+      const { presigned_url, file_url } = await imageService.getPresignedUrl(authStore.storeCode, file.name)
+      await imageService.uploadToS3(presigned_url, file)
+      imageUrl.value = file_url
+      return file_url
     } finally {
       uploading.value = false
     }
   }
 
-  return { uploading, imageUrl, upload }
+  return { uploading, imageUrl, uploadImage }
 }

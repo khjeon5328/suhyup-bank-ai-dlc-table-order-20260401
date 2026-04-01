@@ -23,9 +23,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useAuthStore } from '../stores/authStore'
-import { tableService } from '../services/tableService'
-import TableSetupForm from '../components/TableSetupForm.vue'
+import { useAuthStore } from '@/stores/authStore'
+import { tableService } from '@/services/tableService'
+import TableSetupForm from '@/components/TableSetupForm.vue'
 const auth = useAuthStore()
 const tables = ref([]); const loading = ref(false); const showSetup = ref(false)
 

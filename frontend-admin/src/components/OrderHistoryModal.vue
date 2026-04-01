@@ -30,7 +30,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { tableService } from '../services/tableService'
+import { tableService } from '@/services/tableService'
 const props = defineProps({ storeCode: String, tableNo: Number, visible: Boolean })
 defineEmits(['close'])
 const history = ref([]); const loading = ref(false)

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
-import { orderService } from '../services/orderService'
-import { sseService } from '../services/sseService'
-import { useAuthStore } from './authStore'
+import { orderService } from '@/services/orderService'
+import { sseService } from '@/services/sseService'
+import { useAuthStore } from '@/stores/authStore'
 
 export const useOrderStore = defineStore('adminOrder', {
   state: () => ({ orders: [], isLoading: false, sseConnected: false, sseConnectionLost: false }),

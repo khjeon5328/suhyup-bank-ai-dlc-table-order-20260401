@@ -32,7 +32,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { userService } from '../services/userService'
+import { userService } from '@/services/userService'
 const props = defineProps({ user: Object, storeCode: String })
 const emit = defineEmits(['close', 'saved'])
 const form = ref({ username: '', password: '', role: 'manager' })

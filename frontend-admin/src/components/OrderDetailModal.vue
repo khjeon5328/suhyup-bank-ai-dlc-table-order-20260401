@@ -25,7 +25,7 @@
 </template>
 
 <script setup>
-import OrderStatusBadge from './OrderStatusBadge.vue'
+import OrderStatusBadge from '@/components/OrderStatusBadge.vue'
 defineProps({ order: Object, visible: Boolean })
 defineEmits(['close'])
 </script>

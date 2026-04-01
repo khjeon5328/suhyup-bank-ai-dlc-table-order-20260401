@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useAuthStore } from '@/stores/auth'
-import { useOrderStore } from '@/stores/order'
+import { useAuthStore } from '@/stores/authStore'
+import { useOrderStore } from '@/stores/orderStore'
 import OrderStatusBadge from '@/components/common/OrderStatusBadge.vue'
 
 const props = defineProps<{

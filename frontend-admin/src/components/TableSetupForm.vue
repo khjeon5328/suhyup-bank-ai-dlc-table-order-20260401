@@ -25,7 +25,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { tableService } from '../services/tableService'
+import { tableService } from '@/services/tableService'
 const props = defineProps({ storeCode: String })
 const emit = defineEmits(['close', 'saved'])
 const tableNo = ref(''); const password = ref(''); const saving = ref(false); const error = ref('')

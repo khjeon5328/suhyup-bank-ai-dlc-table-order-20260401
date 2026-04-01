@@ -30,8 +30,8 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useAuthStore } from '../stores/authStore'
-import OrderStatusBadge from './OrderStatusBadge.vue'
+import { useAuthStore } from '@/stores/authStore'
+import OrderStatusBadge from '@/components/OrderStatusBadge.vue'
 defineProps({ group: Object })
 defineEmits(['view-detail', 'change-status', 'delete-order', 'end-session', 'view-history'])
 const auth = useAuthStore()

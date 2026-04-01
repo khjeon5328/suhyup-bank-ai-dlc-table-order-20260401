@@ -2,7 +2,7 @@
 import { reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/authStore'
 import { useTableStore } from '@/stores/table'
 import type { FormInstance } from 'element-plus'
 
