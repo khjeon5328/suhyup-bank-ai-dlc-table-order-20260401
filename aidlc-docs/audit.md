@@ -306,3 +306,10 @@
 **Context**: Git merge conflict resolution - Unit 1 (지현) + Unit 3 (국현) 작업 병합
 
 ---
+
+## CONSTRUCTION - Build and Test (All Units)
+**Timestamp**: 2026-04-01T01:00:00Z
+**AI Response**: 4개 유닛 통합 검증 완료. store_code/table_no 기반 API 경로 통일, SSE 쿼리 토큰 인증 추가, 머지 충돌 해결. Build and Test 지침서 최종 업데이트 (빌드 지침, 단위 테스트, 통합 테스트 7개 시나리오, 성능 테스트 4개 시나리오). 빌드 환경(Python, Node.js) 미설치로 실제 실행은 팀에서 수행 필요.
+**Context**: Build and Test - Complete
+
+---
