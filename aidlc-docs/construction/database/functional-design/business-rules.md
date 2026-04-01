@@ -1,5 +1,7 @@
 # Business Rules - Unit 1: database
 
+> 담당자: 지현
+
 ---
 
 ## 1. 데이터 검증 규칙

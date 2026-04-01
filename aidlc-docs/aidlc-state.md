@@ -4,7 +4,15 @@
 - **Project Name**: 테이블오더 서비스 (Table Order Service)
 - **Project Type**: Greenfield
 - **Start Date**: 2026-04-01T00:00:00Z
-- **Current Stage**: CONSTRUCTION - Unit 1 (database) Complete, awaiting other units
+- **Current Stage**: CONSTRUCTION - Unit 1 (database) Complete, Unit 3 (frontend-customer) Complete, awaiting other units
+
+## Team Assignment
+| Unit | Name | Assignee |
+|------|------|----------|
+| Unit 1 | database | 지현 |
+| Unit 2 | backend | 소윤 |
+| Unit 3 | frontend-customer | 국현 |
+| Unit 4 | frontend-admin | 수민 |
 
 ## Workspace State
 - **Existing Code**: No
@@ -32,5 +40,5 @@
 - [x] CONSTRUCTION - NFR Requirements - EXECUTE (per-unit)
 - [x] CONSTRUCTION - NFR Design - EXECUTE (per-unit)
 - [x] CONSTRUCTION - Infrastructure Design - SKIP
-- [x] CONSTRUCTION - Code Generation - EXECUTE (per-unit) [Unit 1: database COMPLETE]
+- [x] CONSTRUCTION - Code Generation - EXECUTE (per-unit) [Unit 1: database COMPLETE, Unit 3: frontend-customer COMPLETE]
 - [ ] CONSTRUCTION - Build and Test - EXECUTE
