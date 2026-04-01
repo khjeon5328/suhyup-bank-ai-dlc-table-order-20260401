@@ -1,19 +1,19 @@
 import apiClient from './apiClient'
 
 export const userService = {
-  async getUsers(storeId) {
-    const { data } = await apiClient.get(`/stores/${storeId}/users`)
+  async getUsers(storeCode) {
+    const { data } = await apiClient.get(`/stores/${storeCode}/users`)
     return data
   },
-  async createUser(storeId, userData) {
-    const { data } = await apiClient.post(`/stores/${storeId}/users`, userData)
+  async createUser(storeCode, userData) {
+    const { data } = await apiClient.post(`/stores/${storeCode}/users`, userData)
     return data
   },
-  async updateUser(storeId, userId, userData) {
-    const { data } = await apiClient.put(`/stores/${storeId}/users/${userId}`, userData)
+  async updateUser(storeCode, userId, userData) {
+    const { data } = await apiClient.put(`/stores/${storeCode}/users/${userId}`, userData)
     return data
   },
-  async deleteUser(storeId, userId) {
-    await apiClient.delete(`/stores/${storeId}/users/${userId}`)
+  async deleteUser(storeCode, userId) {
+    await apiClient.delete(`/stores/${storeCode}/users/${userId}`)
   }
 }

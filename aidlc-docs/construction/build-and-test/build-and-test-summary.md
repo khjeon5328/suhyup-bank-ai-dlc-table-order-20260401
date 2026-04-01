@@ -7,15 +7,15 @@
 | Unit 1: database | 지현 | ✅ 완료 |
 | Unit 2: backend | 소윤 | ✅ 완료 |
 | Unit 3: frontend-customer | 국현 | ✅ 완료 |
-| Unit 4: frontend-admin | 수민 | ⏳ 대기 |
+| Unit 4: frontend-admin | 수민 | ✅ 완료 |
 
 ## 연동 검증 현황
 
 | 연동 | 상태 |
 |------|------|
 | Unit 1 ↔ Unit 2 (DB 모델 참조) | ✅ 확인됨 |
-| Unit 2 ↔ Unit 3 (API 엔드포인트) | ✅ 확인됨 + 불일치 수정 완료 |
-| Unit 2 ↔ Unit 4 (API 엔드포인트) | ⏳ Unit 4 완료 후 확인 |
+| Unit 2 ↔ Unit 3 (API 엔드포인트) | ✅ 확인됨 + store_code 기반 통합 수정 완료 |
+| Unit 2 ↔ Unit 4 (API 엔드포인트) | ✅ 확인됨 + store_code 기반 통합 수정 완료 |
 
 ## 생성된 지침서
 

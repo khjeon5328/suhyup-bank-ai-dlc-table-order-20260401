@@ -18,7 +18,7 @@
         </tr>
       </tbody>
     </table>
-    <UserForm v-if="showForm" :user="editingUser" :storeId="auth.storeId"
+    <UserForm v-if="showForm" :user="editingUser" :storeCode="auth.storeCode"
               @close="showForm = false" @saved="loadUsers" />
   </div>
 </template>
@@ -35,12 +35,12 @@ function openForm(user) { editingUser.value = user; showForm.value = true }
 
 async function loadUsers() {
   loading.value = true; showForm.value = false
-  try { users.value = await userService.getUsers(auth.storeId) } finally { loading.value = false }
+  try { users.value = await userService.getUsers(auth.storeCode) } finally { loading.value = false }
 }
 
 async function handleDelete(u) {
   if (!confirm(`"${u.username}" 계정을 삭제하시겠습니까?`)) return
-  try { await userService.deleteUser(auth.storeId, u.id); await loadUsers() }
+  try { await userService.deleteUser(auth.storeCode, u.id); await loadUsers() }
   catch (e) { alert(e.response?.data?.detail || '삭제에 실패했습니다.') }
 }
 

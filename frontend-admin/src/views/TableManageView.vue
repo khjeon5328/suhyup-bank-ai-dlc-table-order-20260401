@@ -17,7 +17,7 @@
         </tr>
       </tbody>
     </table>
-    <TableSetupForm v-if="showSetup" :storeId="auth.storeId" @close="showSetup = false" @saved="loadTables" />
+    <TableSetupForm v-if="showSetup" :storeCode="auth.storeCode" @close="showSetup = false" @saved="loadTables" />
   </div>
 </template>
 
@@ -31,12 +31,12 @@ const tables = ref([]); const loading = ref(false); const showSetup = ref(false)
 
 async function loadTables() {
   loading.value = true; showSetup.value = false
-  try { tables.value = await tableService.getTables(auth.storeId) } finally { loading.value = false }
+  try { tables.value = await tableService.getTables(auth.storeCode) } finally { loading.value = false }
 }
 
 async function handleEndSession(t) {
   if (!confirm(`테이블 ${t.table_no}을 이용 완료 처리하시겠습니까?`)) return
-  try { await tableService.endSession(auth.storeId, t.id); await loadTables() }
+  try { await tableService.endSession(auth.storeCode, t.table_no); await loadTables() }
   catch (e) { alert(e.response?.data?.detail || '처리에 실패했습니다.') }
 }
 

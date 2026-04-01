@@ -20,15 +20,15 @@ export const useOrderStore = defineStore('adminOrder', {
     async fetchOrders() {
       const auth = useAuthStore()
       this.isLoading = true
-      try { this.orders = await orderService.getOrders(auth.storeId) } finally { this.isLoading = false }
+      try { this.orders = await orderService.getOrders(auth.storeCode) } finally { this.isLoading = false }
     },
     async updateStatus(orderId, status) {
       const auth = useAuthStore()
-      return await orderService.updateStatus(auth.storeId, orderId, status)
+      return await orderService.updateStatus(auth.storeCode, orderId, status)
     },
     async deleteOrder(orderId) {
       const auth = useAuthStore()
-      await orderService.deleteOrder(auth.storeId, orderId)
+      await orderService.deleteOrder(auth.storeCode, orderId)
       this.orders = this.orders.filter(o => o.id !== orderId)
     },
     addOrder(order) { this.orders.unshift(order) },
@@ -44,7 +44,7 @@ export const useOrderStore = defineStore('adminOrder', {
       sseService.on('order_status_changed', (d) => this.updateOrderInList(d.order_id, d.new_status))
       sseService.on('order_deleted', (d) => this.removeOrderFromList(d.order_id))
       sseService.onMaxRetriesExceeded = () => { this.sseConnectionLost = true }
-      sseService.connect(auth.storeId)
+      sseService.connect(auth.storeCode)
       this.sseConnected = true
     },
     disconnectSSE() { sseService.disconnect(); this.sseConnected = false }

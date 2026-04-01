@@ -12,7 +12,7 @@ describe('admin authStore', () => {
   })
 
   it('logout 시 상태 초기화', () => {
-    store.token = 'test'; store.role = 'owner'; store.storeId = 1
+    store.token = 'test'; store.role = 'owner'; store.storeCode = 'STORE001'
     store.logout()
     expect(store.token).toBeNull()
     expect(store.role).toBeNull()

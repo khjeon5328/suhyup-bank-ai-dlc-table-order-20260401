@@ -10,7 +10,7 @@
     </div>
     <OrderDetailModal v-if="selectedOrder" :order="selectedOrder" :visible="showDetail"
                       @close="showDetail = false" />
-    <OrderHistoryModal v-if="showHistoryModal" :storeId="auth.storeId" :tableId="historyTableId"
+    <OrderHistoryModal v-if="showHistoryModal" :storeCode="auth.storeCode" :tableNo="historyTableId"
                        :visible="showHistoryModal" @close="showHistoryModal = false" />
     <ConfirmDialog v-if="confirmAction" :message="confirmMessage" @confirm="executeConfirm" @cancel="confirmAction = null" />
   </div>
@@ -49,7 +49,7 @@ function confirmDelete(order) {
 
 function confirmEndSession(tableId) {
   confirmMessage.value = '이 테이블을 이용 완료 처리하시겠습니까?'
-  confirmAction.value = 'endSession'; pendingData = { tableId }
+  confirmAction.value = 'endSession'; pendingData = { tableNo: tableId }
 }
 
 async function executeConfirm() {
@@ -57,7 +57,7 @@ async function executeConfirm() {
     if (confirmAction.value === 'changeStatus') await orderStore.updateStatus(pendingData.orderId, pendingData.status)
     else if (confirmAction.value === 'delete') await orderStore.deleteOrder(pendingData.orderId)
     else if (confirmAction.value === 'endSession') {
-      await tableService.endSession(auth.storeId, pendingData.tableId)
+      await tableService.endSession(auth.storeCode, pendingData.tableNo)
       await orderStore.fetchOrders()
     }
   } catch (e) { alert(e.response?.data?.detail || '처리에 실패했습니다.') }

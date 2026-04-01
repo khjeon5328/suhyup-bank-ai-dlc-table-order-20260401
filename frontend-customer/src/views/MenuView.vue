@@ -51,8 +51,8 @@ onMounted(async () => {
   isLoading.value = true
   try {
     const [cats, menuList] = await Promise.all([
-      menuService.getCategories(authStore.storeId),
-      menuService.getMenus(authStore.storeId)
+      menuService.getCategories(authStore.storeCode),
+      menuService.getMenus(authStore.storeCode)
     ])
     categories.value = cats
     menus.value = menuList

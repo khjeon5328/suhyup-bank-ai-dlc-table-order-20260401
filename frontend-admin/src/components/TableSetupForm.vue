@@ -26,13 +26,13 @@
 <script setup>
 import { ref } from 'vue'
 import { tableService } from '../services/tableService'
-const props = defineProps({ storeId: Number })
+const props = defineProps({ storeCode: String })
 const emit = defineEmits(['close', 'saved'])
 const tableNo = ref(''); const password = ref(''); const saving = ref(false); const error = ref('')
 
 async function handleSubmit() {
   error.value = ''; saving.value = true
-  try { await tableService.setupTable(props.storeId, tableNo.value, password.value); emit('saved') }
+  try { await tableService.setupTable(props.storeCode, tableNo.value, password.value); emit('saved') }
   catch (e) { error.value = e.response?.data?.detail || '저장에 실패했습니다.' }
   finally { saving.value = false }
 }

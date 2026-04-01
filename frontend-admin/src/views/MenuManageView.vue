@@ -21,7 +21,7 @@
         </tr>
       </tbody>
     </table>
-    <MenuForm v-if="showForm" :menu="editingMenu" :categories="categories" :storeId="auth.storeId"
+    <MenuForm v-if="showForm" :menu="editingMenu" :categories="categories" :storeCode="auth.storeCode"
               @close="showForm = false" @saved="loadData" />
   </div>
 </template>
@@ -41,14 +41,14 @@ function openForm(menu) { editingMenu.value = menu; showForm.value = true }
 async function loadData() {
   loading.value = true; showForm.value = false
   try {
-    const [m, c] = await Promise.all([menuService.getMenus(auth.storeId), menuService.getCategories(auth.storeId)])
+    const [m, c] = await Promise.all([menuService.getMenus(auth.storeCode), menuService.getCategories(auth.storeCode)])
     menus.value = m; categories.value = c
   } finally { loading.value = false }
 }
 
 async function handleDelete(menu) {
   if (!confirm(`"${menu.name}" 메뉴를 삭제하시겠습니까?`)) return
-  try { await menuService.deleteMenu(auth.storeId, menu.id); await loadData() }
+  try { await menuService.deleteMenu(auth.storeCode, menu.id); await loadData() }
   catch (e) { alert(e.response?.data?.detail || '삭제에 실패했습니다.') }
 }
 

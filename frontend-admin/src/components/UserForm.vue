@@ -33,7 +33,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { userService } from '../services/userService'
-const props = defineProps({ user: Object, storeId: Number })
+const props = defineProps({ user: Object, storeCode: String })
 const emit = defineEmits(['close', 'saved'])
 const form = ref({ username: '', password: '', role: 'manager' })
 const saving = ref(false); const error = ref('')
@@ -47,8 +47,8 @@ async function handleSubmit() {
   try {
     const payload = { ...form.value }
     if (props.user && !payload.password) delete payload.password
-    if (props.user) await userService.updateUser(props.storeId, props.user.id, payload)
-    else await userService.createUser(props.storeId, payload)
+    if (props.user) await userService.updateUser(props.storeCode, props.user.id, payload)
+    else await userService.createUser(props.storeCode, payload)
     emit('saved')
   } catch (e) { error.value = e.response?.data?.detail || '저장에 실패했습니다.' }
   finally { saving.value = false }

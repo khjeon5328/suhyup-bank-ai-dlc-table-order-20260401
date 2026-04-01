@@ -1,27 +1,27 @@
 import apiClient from './apiClient'
 
 export const menuService = {
-  async getCategories(storeId) {
-    const { data } = await apiClient.get(`/stores/${storeId}/menus/categories`)
+  async getCategories(storeCode) {
+    const { data } = await apiClient.get(`/stores/${storeCode}/menus/categories`)
     return data
   },
-  async getMenus(storeId, categoryId = null) {
+  async getMenus(storeCode, categoryId = null) {
     const params = categoryId ? { category_id: categoryId } : {}
-    const { data } = await apiClient.get(`/stores/${storeId}/menus`, { params })
+    const { data } = await apiClient.get(`/stores/${storeCode}/menus`, { params })
     return data
   },
-  async createMenu(storeId, menuData) {
-    const { data } = await apiClient.post(`/stores/${storeId}/menus`, menuData)
+  async createMenu(storeCode, menuData) {
+    const { data } = await apiClient.post(`/stores/${storeCode}/menus`, menuData)
     return data
   },
-  async updateMenu(storeId, menuId, menuData) {
-    const { data } = await apiClient.put(`/stores/${storeId}/menus/${menuId}`, menuData)
+  async updateMenu(storeCode, menuId, menuData) {
+    const { data } = await apiClient.put(`/stores/${storeCode}/menus/${menuId}`, menuData)
     return data
   },
-  async deleteMenu(storeId, menuId) {
-    await apiClient.delete(`/stores/${storeId}/menus/${menuId}`)
+  async deleteMenu(storeCode, menuId) {
+    await apiClient.delete(`/stores/${storeCode}/menus/${menuId}`)
   },
-  async updateMenuOrder(storeId, items) {
-    await apiClient.put(`/stores/${storeId}/menus/order`, { items })
+  async updateMenuOrder(storeCode, items) {
+    await apiClient.put(`/stores/${storeCode}/menus/order`, { items })
   }
 }

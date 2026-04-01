@@ -2,7 +2,7 @@
   <div v-if="visible" class="modal-overlay" @click.self="$emit('close')" data-testid="history-modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>과거 주문 내역 — 테이블 {{ tableId }}</h2>
+        <h2>과거 주문 내역 — 테이블 {{ tableNo }}</h2>
         <button class="close-btn" @click="$emit('close')">✕</button>
       </div>
       <div class="filters">
@@ -31,14 +31,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { tableService } from '../services/tableService'
-const props = defineProps({ storeId: Number, tableId: Number, visible: Boolean })
+const props = defineProps({ storeCode: String, tableNo: Number, visible: Boolean })
 defineEmits(['close'])
 const history = ref([]); const loading = ref(false)
 const dateFrom = ref(''); const dateTo = ref('')
 
 async function loadHistory() {
   loading.value = true
-  try { history.value = await tableService.getHistory(props.storeId, props.tableId, dateFrom.value || null, dateTo.value || null) }
+  try { history.value = await tableService.getHistory(props.storeCode, props.tableNo, dateFrom.value || null, dateTo.value || null) }
   catch { history.value = [] }
   finally { loading.value = false }
 }

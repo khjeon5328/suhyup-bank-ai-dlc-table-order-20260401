@@ -18,10 +18,10 @@ describe('authStore', () => {
 
   it('logout 시 토큰 제거', () => {
     store.token = 'test-token'
-    store.storeId = 1
+    store.storeCode = 'STORE001'
     store.logout()
     expect(store.token).toBeNull()
-    expect(store.storeId).toBeNull()
+    expect(store.storeCode).toBeNull()
     expect(localStorage.getItem('token')).toBeNull()
   })
 
