@@ -4,7 +4,7 @@
 - **Project Name**: 테이블오더 서비스 (Table Order Service)
 - **Project Type**: Greenfield
 - **Start Date**: 2026-04-01T00:00:00Z
-- **Current Stage**: CONSTRUCTION - Unit 1 (database) Complete, Unit 3 (frontend-customer) Complete, awaiting other units
+- **Current Stage**: CONSTRUCTION - Code Generation (Unit 2: backend), Unit 1 (database) Complete, Unit 3 (frontend-customer) Complete
 
 ## Team Assignment
 | Unit | Name | Assignee |
