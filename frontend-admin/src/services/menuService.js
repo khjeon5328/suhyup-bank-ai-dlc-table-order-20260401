@@ -7,11 +7,11 @@ export const menuService = {
   },
   async getMenus(storeCode, categoryId = null) {
     const params = categoryId ? { category_id: categoryId } : {}
-    const { data } = await apiClient.get(`/stores/${storeCode}/menus`, { params })
+    const { data } = await apiClient.get(`/stores/${storeCode}/menus/`, { params })
     return data
   },
   async createMenu(storeCode, menuData) {
-    const { data } = await apiClient.post(`/stores/${storeCode}/menus`, menuData)
+    const { data } = await apiClient.post(`/stores/${storeCode}/menus/`, menuData)
     return data
   },
   async updateMenu(storeCode, menuId, menuData) {

@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
     # Database
-    DATABASE_URL: str = "mysql+aiomysql://user:password@localhost:3306/table_order"
+    DATABASE_URL: str = "sqlite+aiosqlite:///./table_order.db"
 
     # JWT
     JWT_SECRET_KEY: str = "change-me-in-production"
@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     S3_REGION: str = "ap-northeast-2"
 
     # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:5174"]
+    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174"]
 
     # Rate Limiting
     RATE_LIMIT_LOGIN: str = "20/15minutes"

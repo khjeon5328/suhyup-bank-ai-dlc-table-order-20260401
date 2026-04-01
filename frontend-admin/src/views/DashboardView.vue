@@ -4,7 +4,7 @@
     <div v-if="orderStore.isLoading" class="loading">불러오는 중...</div>
     <div v-else-if="orderStore.orders.length === 0" class="empty">현재 주문이 없습니다</div>
     <div v-else class="table-grid" data-testid="table-grid">
-      <TableCard v-for="group in orderStore.ordersByTable" :key="group.tableId" :group="group"
+      <TableCard v-for="group in orderStore.ordersByTable" :key="group.tableNo" :group="group"
                  @view-detail="openDetail" @change-status="changeStatus" @delete-order="confirmDelete"
                  @end-session="confirmEndSession" @view-history="openHistory" />
     </div>
@@ -47,9 +47,9 @@ function confirmDelete(order) {
   confirmAction.value = 'delete'; pendingData = { orderId: order.id }
 }
 
-function confirmEndSession(tableId) {
+function confirmEndSession(tableNo) {
   confirmMessage.value = '이 테이블을 이용 완료 처리하시겠습니까?'
-  confirmAction.value = 'endSession'; pendingData = { tableNo: tableId }
+  confirmAction.value = 'endSession'; pendingData = { tableNo }
 }
 
 async function executeConfirm() {
@@ -69,7 +69,7 @@ onUnmounted(() => { orderStore.disconnectSSE() })
 </script>
 
 <style scoped>
-.dashboard h1 { margin-bottom: 20px; font-size: 22px; }
-.loading, .empty { text-align: center; padding: 60px; color: #999; }
-.table-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.dashboard h1 { margin-bottom: 20px; font-size: 24px; color: #1a237e; }
+.loading, .empty { text-align: center; padding: 60px; color: #999; font-size: 16px; }
+.table-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 20px; }
 </style>

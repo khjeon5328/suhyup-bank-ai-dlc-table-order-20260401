@@ -8,7 +8,7 @@
       <p class="card-name">{{ menu.name }}</p>
       <p class="card-price">{{ formatPrice(menu.price) }}</p>
     </div>
-    <button class="add-btn" @click.stop="$emit('add-to-cart')" :data-testid="`menu-add-${menu.id}`">추가</button>
+    <button class="add-btn" @click.stop="$emit('add-to-cart', $event)" :data-testid="`menu-add-${menu.id}`">추가</button>
   </div>
 </template>
 
@@ -27,5 +27,6 @@ function onImgError(e) { e.target.style.display = 'none' }
 .card-body { padding: 10px; flex: 1; }
 .card-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
 .card-price { font-size: 15px; color: #1976d2; font-weight: 700; }
-.add-btn { margin: 0 10px 10px; padding: 10px; background: #1976d2; color: #fff; border: none; border-radius: 8px; font-size: 14px; min-height: 44px; cursor: pointer; }
+.add-btn { margin: 0 10px 10px; padding: 10px; background: #1976d2; color: #fff; border: none; border-radius: 8px; font-size: 14px; min-height: 44px; cursor: pointer; transition: transform 0.15s ease; }
+.add-btn:active { transform: scale(0.9); }
 </style>

@@ -6,7 +6,7 @@
         <button class="close-btn" @click="$emit('close')" data-testid="modal-close">✕</button>
       </div>
       <div class="modal-body">
-        <p><strong>테이블:</strong> {{ order.table_id }}</p>
+        <p><strong>테이블:</strong> {{ order.table_no }}</p>
         <p><strong>시각:</strong> {{ new Date(order.created_at).toLocaleString('ko-KR') }}</p>
         <p><strong>상태:</strong> <OrderStatusBadge :status="order.status" /></p>
         <table class="items-table">

@@ -8,7 +8,7 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
 from app.config import settings
-from app.core.database import engine
+from app.core.database import async_session_factory, engine
 from app.core.exceptions import AppException, app_exception_handler, global_exception_handler
 from app.core.logging_config import setup_logging
 from app.middleware.request_id import RequestIDMiddleware
@@ -19,6 +19,14 @@ from app.routers import auth, events, images, menus, orders, stores, tables, use
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     setup_logging()
+    # Auto-create tables (SQLite dev mode)
+    from app.models.base import Base
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    # Seed data
+    from app.core.seed import seed_data
+    async with async_session_factory() as session:
+        await seed_data(session)
     yield
     await engine.dispose()
 
@@ -29,8 +37,8 @@ app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RequestIDMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )

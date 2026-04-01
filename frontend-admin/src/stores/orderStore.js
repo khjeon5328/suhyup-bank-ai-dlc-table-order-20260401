@@ -1,26 +1,40 @@
 import { defineStore } from 'pinia'
 import { orderService } from '../services/orderService'
+import { tableService } from '../services/tableService'
 import { sseService } from '../services/sseService'
 import { useAuthStore } from './authStore'
 
 export const useOrderStore = defineStore('adminOrder', {
-  state: () => ({ orders: [], isLoading: false, sseConnected: false, sseConnectionLost: false }),
+  state: () => ({ orders: [], tables: [], isLoading: false, sseConnected: false, sseConnectionLost: false }),
   getters: {
     ordersByTable: (s) => {
+      // Build map from orders
       const map = {}
       s.orders.forEach(o => {
-        if (!map[o.table_id]) map[o.table_id] = { tableId: o.table_id, orders: [], totalAmount: 0 }
-        map[o.table_id].orders.push(o)
-        map[o.table_id].totalAmount += o.total_amount
+        const key = o.table_no
+        if (!map[key]) map[key] = { tableNo: key, orders: [], totalAmount: 0 }
+        map[key].orders.push(o)
+        map[key].totalAmount += o.total_amount
       })
-      return Object.values(map)
+      // Ensure all tables are included (even without orders)
+      s.tables.forEach(t => {
+        if (!map[t.table_no]) map[t.table_no] = { tableNo: t.table_no, orders: [], totalAmount: 0 }
+      })
+      return Object.values(map).sort((a, b) => a.tableNo - b.tableNo)
     }
   },
   actions: {
     async fetchOrders() {
       const auth = useAuthStore()
       this.isLoading = true
-      try { this.orders = await orderService.getOrders(auth.storeCode) } finally { this.isLoading = false }
+      try {
+        const [orders, tables] = await Promise.all([
+          orderService.getOrders(auth.storeCode),
+          tableService.getTables(auth.storeCode),
+        ])
+        this.orders = orders
+        this.tables = tables
+      } finally { this.isLoading = false }
     },
     async updateStatus(orderId, status) {
       const auth = useAuthStore()

@@ -2,7 +2,7 @@ import apiClient from './apiClient'
 
 export const orderService = {
   async getOrders(storeCode) {
-    const { data } = await apiClient.get(`/stores/${storeCode}/orders`)
+    const { data } = await apiClient.get(`/stores/${storeCode}/orders/`)
     return data
   },
   async getOrder(storeCode, orderId) {
