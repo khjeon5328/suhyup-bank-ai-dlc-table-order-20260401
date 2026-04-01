@@ -1,36 +1,87 @@
-# Build and Test Summary - 테이블오더 서비스
+# Build and Test Summary - frontend-admin
 
-## 프로젝트 현황
+> 담당자: 수민
 
-| 유닛 | 담당 | 상태 |
-|------|------|------|
-| Unit 1: database | 지현 | ✅ 완료 |
-| Unit 2: backend | 소윤 | ✅ 완료 |
-| Unit 3: frontend-customer | 국현 | ✅ 완료 |
-| Unit 4: frontend-admin | 수민 | ✅ 완료 |
+---
 
-## 연동 검증 현황
+## 빌드 정보
 
-| 연동 | 상태 |
+| 항목 | 값 |
+|------|-----|
+| 빌드 도구 | Vite 5.x |
+| 언어 | TypeScript 5.x (strict mode) |
+| 프레임워크 | Vue.js 3.4+ |
+| UI 라이브러리 | Element Plus 2.x (auto-import) |
+| 출력 디렉토리 | `dist/` |
+| 예상 초기 로드 | ~235KB (gzip) |
+| 개발 서버 포트 | 3001 |
+
+---
+
+## 테스트 요약
+
+| 테스트 유형 | 도구 | 파일 수 | 예상 테스트 수 | 커버리지 목표 |
+|------------|------|--------|--------------|-------------|
+| 단위 테스트 | Jest 29.x + @vue/test-utils 2.x | 13 | ~33 | 80%+ |
+| 통합 테스트 | 수동 (브라우저) | 5 시나리오 | - | - |
+| E2E 테스트 | Cypress 13.x | 4 | ~12 | - |
+
+### 단위 테스트 상세
+
+| 카테고리 | 파일 수 | 예상 테스트 수 |
+|---------|--------|--------------|
+| 서비스 (services) | 4 | ~12 |
+| 스토어 (stores) | 5 | ~15 |
+| Composable | 2 | ~4 |
+| 컴포넌트 | 2 | ~4 |
+
+### 통합 테스트 시나리오
+
+| # | 시나리오 | 검증 항목 |
+|---|---------|----------|
+| 1 | 인증 플로우 | 로그인 → 토큰 갱신 → 로그아웃 |
+| 2 | SSE 모니터링 | 연결 → 이벤트 수신 → UI 반영 |
+| 3 | RBAC | owner/manager 역할별 접근 제어 |
+| 4 | 메뉴 CRUD | 카테고리/메뉴 생성 → 수정 → 삭제 |
+| 5 | 테이블 관리 | 설정 → 주문 처리 → 이용 완료 → 과거 내역 |
+
+### E2E 테스트 시나리오
+
+| # | 시나리오 | 파일 |
+|---|---------|------|
+| 1 | 로그인 플로우 | `login.cy.ts` |
+| 2 | 주문 상태 관리 | `order-status.cy.ts` |
+| 3 | 메뉴 CRUD | `menu-manage.cy.ts` |
+| 4 | 역할 기반 접근 제어 | `role-access.cy.ts` |
+
+---
+
+## 명령어 참조
+
+| 명령어 | 설명 |
+|--------|------|
+| `npm install` | 의존성 설치 |
+| `npm run dev` | 개발 서버 실행 (포트 3001) |
+| `npm run build` | 프로덕션 빌드 |
+| `npm run preview` | 빌드 결과 미리보기 |
+| `npm test` | 단위 테스트 실행 |
+| `npx jest --coverage` | 커버리지 리포트 |
+| `npm run test:e2e` | Cypress E2E 테스트 (헤드리스) |
+| `npx cypress open` | Cypress GUI 모드 |
+| `npm run lint` | ESLint 검사 |
+| `npm run format` | Prettier 포맷팅 |
+
+---
+
+## 관련 문서
+
+| 문서 | 경로 |
 |------|------|
-| Unit 1 ↔ Unit 2 (DB 모델 참조) | ✅ 확인됨 |
-| Unit 2 ↔ Unit 3 (API 엔드포인트) | ✅ 확인됨 + store_code 기반 통합 수정 완료 |
-| Unit 2 ↔ Unit 4 (API 엔드포인트) | ✅ 확인됨 + store_code 기반 통합 수정 완료 |
-
-## 생성된 지침서
-
-| 파일 | 상태 |
-|------|------|
-| build-instructions.md | ✅ 생성 |
-| unit-test-instructions.md | ✅ 생성 |
-| integration-test-instructions.md | ✅ 생성 (7개 시나리오) |
-| performance-test-instructions.md | ✅ 생성 (4개 시나리오) |
-| build-and-test-summary.md | ✅ 생성 |
-
-## 다음 단계
-1. Unit 4 (frontend-admin) 코드 완료 대기
-2. Unit 2 ↔ Unit 4 연동 검증
-3. 전체 빌드 실행
-4. 단위 테스트 실행 (4개 유닛)
-5. 통합 테스트 실행 (7개 시나리오)
-6. 성능 테스트 실행 (선택)
+| 빌드 상세 | `build-and-test/build-instructions.md` |
+| 단위 테스트 상세 | `build-and-test/unit-test-instructions.md` |
+| 통합 테스트 상세 | `build-and-test/integration-test-instructions.md` |
+| E2E 테스트 상세 | `build-and-test/e2e-test-instructions.md` |
+| 코드 생성 요약 | `frontend-admin/code/code-generation-summary.md` |
+| 기술 스택 | `frontend-admin/nfr-requirements/tech-stack-decisions.md` |
+| NFR 디자인 패턴 | `frontend-admin/nfr-design/nfr-design-patterns.md` |
+| 논리적 컴포넌트 | `frontend-admin/nfr-design/logical-components.md` |

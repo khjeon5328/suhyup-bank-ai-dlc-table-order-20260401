@@ -1,57 +1,77 @@
-<template>
-  <div class="login-page">
-    <div class="login-card">
-      <h1>관리자 로그인</h1>
-      <form @submit.prevent="handleLogin" data-testid="login-form">
-        <div class="form-group">
-          <label>매장 코드</label>
-          <input v-model="storeCode" type="text" placeholder="매장 코드" data-testid="login-store-code" maxlength="50" />
-        </div>
-        <div class="form-group">
-          <label>사용자명</label>
-          <input v-model="username" type="text" placeholder="사용자명" data-testid="login-username" />
-        </div>
-        <div class="form-group">
-          <label>비밀번호</label>
-          <input v-model="password" type="password" placeholder="비밀번호" data-testid="login-password" />
-        </div>
-        <p v-if="error" class="error" data-testid="login-error">{{ error }}</p>
-        <button type="submit" :disabled="loading" class="login-btn" data-testid="login-submit">
-          {{ loading ? '로그인 중...' : '로그인' }}
-        </button>
-      </form>
-    </div>
-  </div>
-</template>
-
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
+import { reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '../stores/authStore'
-const router = useRouter()
-const auth = useAuthStore()
-const storeCode = ref(''); const username = ref(''); const password = ref('')
-const loading = ref(false); const error = ref('')
+import { useAuth } from '@/composables/useAuth'
+import type { LoginCredentials } from '@/types/auth'
+import type { FormInstance } from 'element-plus'
+import type { AxiosError } from 'axios'
 
-async function handleLogin() {
-  error.value = ''; loading.value = true
+const { t } = useI18n()
+const router = useRouter()
+const { login } = useAuth()
+
+const formRef = ref<FormInstance>()
+const loading = ref(false)
+const errorMsg = ref('')
+
+const form = reactive<LoginCredentials>({
+  storeId: '',
+  username: '',
+  password: '',
+})
+
+const rules = {
+  storeId: [{ required: true, message: () => t('auth.storeId'), trigger: 'blur' }],
+  username: [{ required: true, message: () => t('auth.username'), trigger: 'blur' }],
+  password: [{ required: true, message: () => t('auth.password'), trigger: 'blur' }],
+}
+
+async function handleLogin(): Promise<void> {
+  const valid = await formRef.value?.validate().catch(() => false)
+  if (!valid) return
+
+  loading.value = true
+  errorMsg.value = ''
   try {
-    await auth.login(storeCode.value, username.value, password.value)
+    await login(form)
     router.push('/')
-  } catch (e) {
-    error.value = e.response?.data?.detail || '로그인에 실패했습니다.'
-  } finally { loading.value = false }
+  } catch (e: unknown) {
+    const axiosError = e as AxiosError
+    if (axiosError.response?.status === 429) {
+      errorMsg.value = t('auth.rateLimited')
+    } else {
+      errorMsg.value = t('auth.loginFailed')
+    }
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
-<style scoped>
-.login-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-.login-card { background: #fff; border-radius: 12px; padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
-h1 { text-align: center; margin-bottom: 24px; font-size: 22px; }
-.form-group { margin-bottom: 16px; }
-.form-group label { display: block; margin-bottom: 6px; font-size: 14px; color: #555; }
-.form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; }
-.error { color: #f44336; text-align: center; margin-bottom: 12px; font-size: 14px; }
-.login-btn { width: 100%; padding: 14px; background: #1a237e; color: #fff; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
-.login-btn:disabled { opacity: 0.6; }
-</style>
+<template>
+  <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f5f7fa">
+    <el-card style="width: 400px" data-testid="login-card">
+      <template #header>
+        <h2 style="text-align: center; margin: 0">{{ t('auth.login') }}</h2>
+      </template>
+      <el-form ref="formRef" :model="form" :rules="rules" label-position="top" @submit.prevent="handleLogin">
+        <el-form-item :label="t('auth.storeId')" prop="storeId">
+          <el-input v-model="form.storeId" data-testid="input-store-id" />
+        </el-form-item>
+        <el-form-item :label="t('auth.username')" prop="username">
+          <el-input v-model="form.username" data-testid="input-username" />
+        </el-form-item>
+        <el-form-item :label="t('auth.password')" prop="password">
+          <el-input v-model="form.password" type="password" show-password data-testid="input-password" />
+        </el-form-item>
+        <el-alert v-if="errorMsg" :title="errorMsg" type="error" show-icon :closable="false" style="margin-bottom: 16px" />
+        <el-form-item>
+          <el-button type="primary" :loading="loading" style="width: 100%" native-type="submit" data-testid="login-button">
+            {{ t('auth.loginButton') }}
+          </el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
+  </div>
+</template>

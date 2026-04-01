@@ -1,86 +1,97 @@
-# Build Instructions - 테이블오더 서비스
+# Build Instructions - frontend-admin
 
-## Prerequisites
-- Python 3.11+
-- Node.js 18+
-- MySQL 8.0+
-- npm 9+
-
-## Environment Variables
-
-### database (Unit 1)
-```bash
-cp table-order/database/.env.example table-order/database/.env
-# DATABASE_URL=mysql+aiomysql://user:password@localhost:3306/table_order
-```
-
-### backend (Unit 2)
-```bash
-cp backend/.env.example backend/.env
-# DATABASE_URL, JWT_SECRET_KEY, CORS_ORIGINS, S3 설정 등
-```
-
-### frontend-customer (Unit 3)
-```bash
-cp frontend-customer/.env.example frontend-customer/.env
-# VITE_API_BASE_URL=/api/v1
-```
-
-### frontend-admin (Unit 4)
-```bash
-cp frontend-admin/.env.example frontend-admin/.env
-# VITE_API_BASE_URL=/api/v1
-```
+> 담당자: 수민
 
 ---
 
-## Build Steps
+## 1. 사전 요구사항
 
-### 1. MySQL 데이터베이스 생성
-```bash
-mysql -u root -p -e "CREATE DATABASE table_order CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-```
+- Node.js 18.x 이상
+- npm 9.x 이상
 
-### 2. Unit 1: database — 마이그레이션 및 시드
-```bash
-cd table-order/database
-pip install -r requirements.txt
-alembic upgrade head
-python -m seed.run_seed
-```
+## 2. 의존성 설치
 
-### 3. Unit 2: backend — 의존성 설치 및 서버 실행
-```bash
-cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-```
-
-### 4. Unit 3: frontend-customer — 빌드
-```bash
-cd frontend-customer
-npm install
-npm run build    # 프로덕션 빌드 → dist/
-npm run dev      # 개발 서버 → http://localhost:3000
-```
-
-### 5. Unit 4: frontend-admin — 빌드
 ```bash
 cd frontend-admin
 npm install
-npm run build    # 프로덕션 빌드 → dist/
-npm run dev      # 개발 서버 → http://localhost:3001
 ```
 
----
+## 3. 환경 변수 설정
 
-## Verify Build Success
-- backend: `http://localhost:8000/health` → `{"status": "ok"}`
-- frontend-customer: `http://localhost:3000` → 테이블 설정 화면
-- frontend-admin: `http://localhost:3001` → 관리자 로그인 화면
+`.env.example`을 복사하여 `.env.development` (개발) 또는 `.env.production` (프로덕션) 생성:
 
-## 시드 데이터 기본 계정
-- 매장 코드: `STORE001`
-- 점주: username `owner`, password (시드에서 설정)
-- 매니저: username `manager`, password (시드에서 설정)
-- 테이블: 1~5번
+```bash
+cp .env.example .env.development
+```
+
+```env
+# .env.development
+VITE_API_BASE_URL=http://localhost:8000/api/v1
+VITE_SSE_BASE_URL=http://localhost:8000/api/v1/sse
+```
+
+```env
+# .env.production
+VITE_API_BASE_URL=https://api.example.com/api/v1
+VITE_SSE_BASE_URL=https://api.example.com/api/v1/sse
+```
+
+## 4. 개발 서버 실행
+
+```bash
+npm run dev
+```
+
+- 기본 포트: **3001** (`vite.config.ts`에서 설정)
+- 접속: `http://localhost:3001`
+- HMR 활성화 (코드 변경 시 자동 반영)
+
+## 5. 프로덕션 빌드
+
+```bash
+npm run build
+```
+
+### 빌드 출력 구조
+
+```
+dist/
+├── index.html
+├── assets/
+│   ├── index-[hash].js          # 앱 코드 (~30KB gzip)
+│   ├── vendor-vue-[hash].js     # Vue 코어 (~45KB gzip)
+│   ├── vendor-element-[hash].js # Element Plus (~120KB gzip)
+│   ├── vendor-i18n-[hash].js    # vue-i18n (~15KB gzip)
+│   ├── vendor-utils-[hash].js   # axios, dayjs 등 (~25KB gzip)
+│   ├── LoginView-[hash].js      # Lazy chunk
+│   ├── MenuManageView-[hash].js # Lazy chunk
+│   ├── UserManageView-[hash].js # Lazy chunk
+│   └── index-[hash].css         # 스타일
+```
+
+### 빌드 미리보기
+
+```bash
+npm run preview
+```
+
+## 6. 린트 및 포맷팅
+
+```bash
+# ESLint 검사
+npm run lint
+
+# Prettier 포맷팅
+npm run format
+```
+
+## 7. Troubleshooting
+
+| 문제 | 원인 | 해결 |
+|------|------|------|
+| `VITE_API_BASE_URL is undefined` | 환경 변수 파일 누락 | `.env.development` 파일 생성 확인 |
+| `Module not found` | 의존성 미설치 | `rm -rf node_modules && npm install` |
+| `Port 3001 already in use` | 포트 충돌 | 다른 프로세스 종료 또는 `vite.config.ts`에서 포트 변경 |
+| Element Plus 스타일 미적용 | auto-import 설정 누락 | `vite.config.ts`에서 ElementPlusResolver 확인 |
+| TypeScript 타입 에러 | tsconfig 경로 설정 | `tsconfig.json`의 `paths` 설정 확인 |
+| CORS 에러 | 백엔드 CORS 미설정 | 백엔드에서 `http://localhost:3001` 허용 |
