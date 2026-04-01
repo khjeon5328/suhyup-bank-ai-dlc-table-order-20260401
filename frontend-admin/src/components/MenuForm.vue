@@ -40,7 +40,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { menuService } from '../services/menuService'
-const props = defineProps({ menu: Object, categories: Array, storeId: Number })
+const props = defineProps({ menu: Object, categories: Array, storeCode: String })
 const emit = defineEmits(['close', 'saved'])
 const form = ref({ name: '', price: 0, category_id: null, description: '', image_url: '' })
 const saving = ref(false); const error = ref('')
@@ -55,8 +55,8 @@ onMounted(() => {
 async function handleSubmit() {
   error.value = ''; saving.value = true
   try {
-    if (props.menu) await menuService.updateMenu(props.storeId, props.menu.id, form.value)
-    else await menuService.createMenu(props.storeId, form.value)
+    if (props.menu) await menuService.updateMenu(props.storeCode, props.menu.id, form.value)
+    else await menuService.createMenu(props.storeCode, form.value)
     emit('saved')
   } catch (e) { error.value = e.response?.data?.detail || '저장에 실패했습니다.' }
   finally { saving.value = false }

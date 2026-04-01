@@ -1,87 +1,88 @@
-# Build and Test Summary - frontend-admin
+# Build and Test Summary - 테이블오더 서비스
 
-> 담당자: 수민
+## 프로젝트 현황
 
----
+| 유닛 | 담당 | 코드 생성 | 연동 검증 |
+|------|------|----------|----------|
+| Unit 1: database | 지현 | ✅ 완료 | ✅ |
+| Unit 2: backend | 소윤 | ✅ 완료 | ✅ |
+| Unit 3: frontend-customer | 국현 | ✅ 완료 | ✅ |
+| Unit 4: frontend-admin | 수민 | ✅ 완료 | ✅ |
 
-## 빌드 정보
+## 연동 검증 결과
 
-| 항목 | 값 |
-|------|-----|
-| 빌드 도구 | Vite 5.x |
-| 언어 | TypeScript 5.x (strict mode) |
-| 프레임워크 | Vue.js 3.4+ |
-| UI 라이브러리 | Element Plus 2.x (auto-import) |
-| 출력 디렉토리 | `dist/` |
-| 예상 초기 로드 | ~235KB (gzip) |
-| 개발 서버 포트 | 3001 |
+| 연동 | 상태 | 수정 내용 |
+|------|------|----------|
+| Unit 1 ↔ Unit 2 | ✅ | store_code 기반 모델 참조 확인 |
+| Unit 2 ↔ Unit 3 | ✅ | store_code/table_no 기반 API 경로 통일, 로그인 응답 구조 맞춤, 불필요 필드 제거 |
+| Unit 2 ↔ Unit 4 | ✅ | store_code/table_no 기반 API 경로 통일, 역할 기반 접근 제어 확인 |
+| SSE 인증 | ✅ | 쿼리 파라미터 토큰 인증 지원 추가 (EventSource 제약) |
 
----
+## 빌드 사전 요구사항
 
-## 테스트 요약
+| 도구 | 버전 | 용도 |
+|------|------|------|
+| Python | 3.11+ | backend, database |
+| Node.js | 18+ | frontend-customer, frontend-admin |
+| MySQL | 8.0+ | 데이터베이스 |
+| npm | 9+ | 프론트엔드 패키지 관리 |
 
-| 테스트 유형 | 도구 | 파일 수 | 예상 테스트 수 | 커버리지 목표 |
-|------------|------|--------|--------------|-------------|
-| 단위 테스트 | Jest 29.x + @vue/test-utils 2.x | 13 | ~33 | 80%+ |
-| 통합 테스트 | 수동 (브라우저) | 5 시나리오 | - | - |
-| E2E 테스트 | Cypress 13.x | 4 | ~12 | - |
+## 빌드 순서
 
-### 단위 테스트 상세
+```
+1. MySQL DB 생성
+2. database: pip install → alembic upgrade head → seed
+3. backend: pip install → uvicorn 실행
+4. frontend-customer: npm install → npm run build
+5. frontend-admin: npm install → npm run build
+```
 
-| 카테고리 | 파일 수 | 예상 테스트 수 |
-|---------|--------|--------------|
-| 서비스 (services) | 4 | ~12 |
-| 스토어 (stores) | 5 | ~15 |
-| Composable | 2 | ~4 |
-| 컴포넌트 | 2 | ~4 |
+## 테스트 실행
 
-### 통합 테스트 시나리오
+### 단위 테스트
+```bash
+# Unit 1: database
+cd table-order/database && pytest tests/ -v
 
-| # | 시나리오 | 검증 항목 |
-|---|---------|----------|
-| 1 | 인증 플로우 | 로그인 → 토큰 갱신 → 로그아웃 |
-| 2 | SSE 모니터링 | 연결 → 이벤트 수신 → UI 반영 |
-| 3 | RBAC | owner/manager 역할별 접근 제어 |
-| 4 | 메뉴 CRUD | 카테고리/메뉴 생성 → 수정 → 삭제 |
-| 5 | 테이블 관리 | 설정 → 주문 처리 → 이용 완료 → 과거 내역 |
+# Unit 2: backend
+cd backend && pytest tests/ -v
 
-### E2E 테스트 시나리오
+# Unit 3: frontend-customer
+cd frontend-customer && npm run test
 
-| # | 시나리오 | 파일 |
-|---|---------|------|
-| 1 | 로그인 플로우 | `login.cy.ts` |
-| 2 | 주문 상태 관리 | `order-status.cy.ts` |
-| 3 | 메뉴 CRUD | `menu-manage.cy.ts` |
-| 4 | 역할 기반 접근 제어 | `role-access.cy.ts` |
+# Unit 4: frontend-admin
+cd frontend-admin && npm run test
+```
 
----
+### 통합 테스트 시나리오 (7개)
+1. 테이블 로그인 (Unit 3 → 2 → 1)
+2. 메뉴 조회 (Unit 3 → 2 → 1)
+3. 주문 생성 → 실시간 모니터링 (Unit 3 → 2 → 4)
+4. 주문 상태 변경 → 고객 실시간 (Unit 4 → 2 → 3)
+5. 테이블 이용 완료 (Unit 4 → 2 → 1)
+6. 역할 기반 접근 제어 (Unit 4 → 2)
+7. 브루트포스 방지 (Unit 4 → 2)
 
-## 명령어 참조
+### 성능 테스트 시나리오 (4개)
+1. 메뉴 조회 부하 (500명 동시)
+2. 주문 생성 부하 (200명 동시)
+3. SSE 동시 연결 (500개)
+4. 혼합 시나리오 (10분)
 
-| 명령어 | 설명 |
-|--------|------|
-| `npm install` | 의존성 설치 |
-| `npm run dev` | 개발 서버 실행 (포트 3001) |
-| `npm run build` | 프로덕션 빌드 |
-| `npm run preview` | 빌드 결과 미리보기 |
-| `npm test` | 단위 테스트 실행 |
-| `npx jest --coverage` | 커버리지 리포트 |
-| `npm run test:e2e` | Cypress E2E 테스트 (헤드리스) |
-| `npx cypress open` | Cypress GUI 모드 |
-| `npm run lint` | ESLint 검사 |
-| `npm run format` | Prettier 포맷팅 |
+## 현재 상태
+- **빌드**: ⏳ 실행 환경 미설치 (Python, Node.js 필요)
+- **단위 테스트**: ⏳ 빌드 환경 설치 후 실행 필요
+- **통합 테스트**: ⏳ 전체 서비스 기동 후 수동 검증 필요
+- **성능 테스트**: ⏳ k6 또는 JMeter 설치 후 실행 필요
 
----
+## 다음 단계
+1. Python 3.11+, Node.js 18+ 설치
+2. 각 유닛 빌드 및 단위 테스트 실행
+3. 전체 서비스 기동 후 통합 테스트 수행
+4. 성능 테스트 수행 (선택)
 
-## 관련 문서
-
-| 문서 | 경로 |
-|------|------|
-| 빌드 상세 | `build-and-test/build-instructions.md` |
-| 단위 테스트 상세 | `build-and-test/unit-test-instructions.md` |
-| 통합 테스트 상세 | `build-and-test/integration-test-instructions.md` |
-| E2E 테스트 상세 | `build-and-test/e2e-test-instructions.md` |
-| 코드 생성 요약 | `frontend-admin/code/code-generation-summary.md` |
-| 기술 스택 | `frontend-admin/nfr-requirements/tech-stack-decisions.md` |
-| NFR 디자인 패턴 | `frontend-admin/nfr-design/nfr-design-patterns.md` |
-| 논리적 컴포넌트 | `frontend-admin/nfr-design/logical-components.md` |
+## 생성된 지침서
+- `build-instructions.md` — 빌드 순서 및 환경 설정
+- `unit-test-instructions.md` — 유닛별 테스트 실행
+- `integration-test-instructions.md` — 7개 통합 테스트 시나리오
+- `performance-test-instructions.md` — 4개 성능 테스트 시나리오

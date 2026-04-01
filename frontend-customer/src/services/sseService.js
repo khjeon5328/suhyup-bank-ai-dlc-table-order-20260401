@@ -11,10 +11,10 @@ export class SSEService {
     this.onMaxRetriesExceeded = null
   }
 
-  connect(storeId, tableId) {
+  connect(storeCode, tableNo) {
     const token = localStorage.getItem('token')
     const baseUrl = import.meta.env.VITE_API_BASE_URL || '/api/v1'
-    const url = `${baseUrl}/stores/${storeId}/events/table/${tableId}?token=${token}`
+    const url = `${baseUrl}/stores/${storeCode}/events/table/${tableNo}?token=${token}`
 
     this.disconnect()
     this.eventSource = new EventSource(url)
@@ -39,7 +39,7 @@ export class SSEService {
       if (this.retryCount < MAX_RETRIES) {
         this.retryCount++
         logger.info('SSEService', 'reconnect', `Retry ${this.retryCount}/${MAX_RETRIES}`)
-        setTimeout(() => this.connect(storeId, tableId), RETRY_DELAY)
+        setTimeout(() => this.connect(storeCode, tableNo), RETRY_DELAY)
       } else {
         logger.error('SSEService', 'connect', 'Max retries exceeded')
         if (this.onMaxRetriesExceeded) this.onMaxRetriesExceeded()

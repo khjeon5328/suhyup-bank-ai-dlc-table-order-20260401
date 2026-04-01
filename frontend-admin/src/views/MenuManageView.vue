@@ -1,103 +1,69 @@
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { ElMessage } from 'element-plus'
-import { useAuthStore } from '@/stores/auth'
-import { useMenuStore } from '@/stores/menu'
-import { useConfirm } from '@/composables/useConfirm'
-import CategoryManageSection from '@/components/menu/CategoryManageSection.vue'
-import MenuFormDialog from '@/components/menu/MenuFormDialog.vue'
-import type { Menu } from '@/types/menu'
-
-const { t } = useI18n()
-const authStore = useAuthStore()
-const menuStore = useMenuStore()
-const { confirm } = useConfirm()
-
-const showCategoryManage = ref(false)
-const showMenuForm = ref(false)
-const editingMenu = ref<Menu | null>(null)
-
-const filteredMenus = computed(() => {
-  if (!menuStore.selectedCategory) return menuStore.menus
-  return menuStore.menus.filter((m) => m.category === menuStore.selectedCategory)
-})
-
-function handleAddMenu(): void {
-  editingMenu.value = null
-  showMenuForm.value = true
-}
-
-function handleEditMenu(menu: Menu): void {
-  editingMenu.value = menu
-  showMenuForm.value = true
-}
-
-async function handleDeleteMenu(menuId: number): Promise<void> {
-  const confirmed = await confirm(t('menu.deleteConfirm'))
-  if (!confirmed || !authStore.storeId) return
-  await menuStore.deleteMenu(authStore.storeId, menuId)
-  ElMessage.success(t('menu.deleteSuccess'))
-}
-
-onMounted(async () => {
-  if (authStore.storeId) {
-    await menuStore.fetchCategories(authStore.storeId)
-    await menuStore.fetchMenus(authStore.storeId)
-  }
-})
-</script>
-
 <template>
-  <div>
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px">
-      <h2 style="margin: 0">{{ t('menu.title') }}</h2>
-      <div style="display: flex; gap: 8px">
-        <el-button data-testid="toggle-category-manage" @click="showCategoryManage = !showCategoryManage">
-          {{ t('menu.categoryManage') }}
-        </el-button>
-        <el-button type="primary" data-testid="add-menu-button" @click="handleAddMenu">
-          {{ t('menu.addMenu') }}
-        </el-button>
-      </div>
+  <div class="menu-manage">
+    <div class="page-header">
+      <h1>메뉴 관리</h1>
+      <button class="add-btn" @click="openForm(null)" data-testid="menu-add-btn">+ 메뉴 추가</button>
     </div>
-
-    <CategoryManageSection v-if="showCategoryManage" style="margin-bottom: 20px" />
-
-    <el-tabs v-model="menuStore.selectedCategory" data-testid="category-tabs">
-      <el-tab-pane :label="t('dashboard.filterAll')" :name="null as any" />
-      <el-tab-pane
-        v-for="cat in menuStore.categories"
-        :key="cat.id"
-        :label="cat.name"
-        :name="cat.name"
-      />
-    </el-tabs>
-
-    <el-table :data="filteredMenus" v-loading="menuStore.loading" data-testid="menu-table">
-      <el-table-column prop="name" :label="t('menu.name')" />
-      <el-table-column prop="price" :label="t('menu.price')">
-        <template #default="{ row }">{{ row.price.toLocaleString() }}</template>
-      </el-table-column>
-      <el-table-column prop="category" :label="t('menu.category')" />
-      <el-table-column prop="displayOrder" :label="t('menu.displayOrder')" width="100" />
-      <el-table-column :label="t('common.edit')" width="160">
-        <template #default="{ row }">
-          <el-button size="small" data-testid="edit-menu-button" @click="handleEditMenu(row)">
-            {{ t('common.edit') }}
-          </el-button>
-          <el-button size="small" type="danger" data-testid="delete-menu-button" @click="handleDeleteMenu(row.id)">
-            {{ t('common.delete') }}
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <MenuFormDialog
-      :visible="showMenuForm"
-      :menu="editingMenu"
-      :categories="menuStore.categories"
-      @update:visible="showMenuForm = $event"
-    />
+    <div v-if="loading" class="loading">불러오는 중...</div>
+    <table v-else class="menu-table" data-testid="menu-table">
+      <thead><tr><th>순서</th><th>메뉴명</th><th>카테고리</th><th>가격</th><th>상태</th><th>관리</th></tr></thead>
+      <tbody>
+        <tr v-for="menu in menus" :key="menu.id" :data-testid="`menu-row-${menu.id}`">
+          <td>{{ menu.sort_order }}</td>
+          <td>{{ menu.name }}</td>
+          <td>{{ getCategoryName(menu.category_id) }}</td>
+          <td>{{ menu.price.toLocaleString() }}원</td>
+          <td>{{ menu.is_active ? '판매중' : '숨김' }}</td>
+          <td>
+            <button class="edit-btn" @click="openForm(menu)" :data-testid="`menu-edit-${menu.id}`">수정</button>
+            <button class="del-btn" @click="handleDelete(menu)" :data-testid="`menu-del-${menu.id}`">삭제</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <MenuForm v-if="showForm" :menu="editingMenu" :categories="categories" :storeCode="auth.storeCode"
+              @close="showForm = false" @saved="loadData" />
   </div>
 </template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useAuthStore } from '../stores/authStore'
+import { menuService } from '../services/menuService'
+import MenuForm from '../components/MenuForm.vue'
+const auth = useAuthStore()
+const menus = ref([]); const categories = ref([]); const loading = ref(false)
+const showForm = ref(false); const editingMenu = ref(null)
+
+function getCategoryName(id) { return categories.value.find(c => c.id === id)?.name || '-' }
+function openForm(menu) { editingMenu.value = menu; showForm.value = true }
+
+async function loadData() {
+  loading.value = true; showForm.value = false
+  try {
+    const [m, c] = await Promise.all([menuService.getMenus(auth.storeCode), menuService.getCategories(auth.storeCode)])
+    menus.value = m; categories.value = c
+  } finally { loading.value = false }
+}
+
+async function handleDelete(menu) {
+  if (!confirm(`"${menu.name}" 메뉴를 삭제하시겠습니까?`)) return
+  try { await menuService.deleteMenu(auth.storeCode, menu.id); await loadData() }
+  catch (e) { alert(e.response?.data?.detail || '삭제에 실패했습니다.') }
+}
+
+onMounted(loadData)
+</script>
+
+<style scoped>
+.menu-manage h1 { font-size: 22px; }
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.add-btn { padding: 10px 20px; background: #1a237e; color: #fff; border: none; border-radius: 8px; cursor: pointer; min-height: 44px; }
+.loading { text-align: center; padding: 40px; color: #999; }
+.menu-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; }
+.menu-table th, .menu-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+.menu-table th { background: #f5f5f5; font-weight: 600; }
+.edit-btn, .del-btn { padding: 6px 12px; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; margin-right: 4px; min-height: 32px; }
+.edit-btn { background: #e3f2fd; color: #1565c0; }
+.del-btn { background: #ffebee; color: #c62828; }
+</style>

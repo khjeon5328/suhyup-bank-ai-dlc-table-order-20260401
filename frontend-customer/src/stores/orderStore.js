@@ -18,7 +18,7 @@ export const useOrderStore = defineStore('order', {
       this.isLoading = true
       try {
         const data = await orderService.createOrder(
-          authStore.storeId, cartStore.items
+          authStore.storeCode, cartStore.items
         )
         cartStore.clearCart()
         if (data.session_id) authStore.updateSessionId(data.session_id)
@@ -31,7 +31,7 @@ export const useOrderStore = defineStore('order', {
       const authStore = useAuthStore()
       this.isLoading = true
       try {
-        const data = await orderService.getOrders(authStore.storeId, page)
+        const data = await orderService.getOrders(authStore.storeCode, page)
         this.currentOrders = data
         return data
       } finally {
@@ -57,7 +57,7 @@ export const useOrderStore = defineStore('order', {
       sseService.onMaxRetriesExceeded = () => {
         this.sseConnectionLost = true
       }
-      sseService.connect(authStore.storeId, authStore.tableId)
+      sseService.connect(authStore.storeCode, authStore.tableNo)
       this.sseConnected = true
     },
     disconnectSSE() {

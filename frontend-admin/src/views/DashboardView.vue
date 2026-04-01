@@ -1,107 +1,75 @@
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useAuthStore } from '@/stores/auth'
-import { useTableStore } from '@/stores/table'
-import { useOrderStore } from '@/stores/order'
-import { usePermission } from '@/composables/usePermission'
-import TableCard from '@/components/dashboard/TableCard.vue'
-import OrderDetailModal from '@/components/dashboard/OrderDetailModal.vue'
-import OrderHistoryPanel from '@/components/dashboard/OrderHistoryPanel.vue'
-import TableSetupDialog from '@/components/dashboard/TableSetupDialog.vue'
-
-const { t } = useI18n()
-const authStore = useAuthStore()
-const tableStore = useTableStore()
-const orderStore = useOrderStore()
-const { canSetupTable } = usePermission()
-
-const filter = ref<'all' | 'active'>('all')
-const selectedTableId = ref<number | null>(null)
-const selectedTableNumber = ref<number>(0)
-const showOrderDetail = ref(false)
-const showHistory = ref(false)
-const showTableSetup = ref(false)
-
-const filteredTables = computed(() => {
-  if (filter.value === 'active') {
-    return tableStore.tables.filter((t) => t.hasActiveSession)
-  }
-  return tableStore.tables
-})
-
-function handleTableClick(tableId: number, tableNumber: number): void {
-  selectedTableId.value = tableId
-  selectedTableNumber.value = tableNumber
-  tableStore.markAsRead(tableId)
-  showOrderDetail.value = true
-}
-
-function handleShowHistory(tableId: number, tableNumber: number): void {
-  selectedTableId.value = tableId
-  selectedTableNumber.value = tableNumber
-  showHistory.value = true
-}
-
-async function handleEndSession(tableId: number): Promise<void> {
-  if (!authStore.storeId) return
-  await tableStore.endSession(authStore.storeId, tableId)
-}
-
-onMounted(async () => {
-  if (authStore.storeId) {
-    await tableStore.fetchTables(authStore.storeId)
-    await orderStore.fetchOrders(authStore.storeId)
-  }
-})
-</script>
-
 <template>
-  <div>
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px">
-      <h2 style="margin: 0">{{ t('dashboard.title') }}</h2>
-      <div style="display: flex; gap: 8px">
-        <el-radio-group v-model="filter" data-testid="table-filter">
-          <el-radio-button value="all">{{ t('dashboard.filterAll') }}</el-radio-button>
-          <el-radio-button value="active">{{ t('dashboard.waiting') }}</el-radio-button>
-        </el-radio-group>
-        <el-button v-if="canSetupTable" type="primary" data-testid="add-table-button" @click="showTableSetup = true">
-          {{ t('dashboard.addTable') }}
-        </el-button>
-      </div>
+  <div class="dashboard">
+    <h1>주문 모니터링</h1>
+    <div v-if="orderStore.isLoading" class="loading">불러오는 중...</div>
+    <div v-else-if="orderStore.orders.length === 0" class="empty">현재 주문이 없습니다</div>
+    <div v-else class="table-grid" data-testid="table-grid">
+      <TableCard v-for="group in orderStore.ordersByTable" :key="group.tableId" :group="group"
+                 @view-detail="openDetail" @change-status="changeStatus" @delete-order="confirmDelete"
+                 @end-session="confirmEndSession" @view-history="openHistory" />
     </div>
-
-    <div v-if="filteredTables.length === 0" style="text-align: center; padding: 40px">
-      <el-empty :description="t('common.noData')" />
-    </div>
-
-    <div v-else style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px">
-      <TableCard
-        v-for="table in filteredTables"
-        :key="table.tableId"
-        :table="table"
-        :has-new-order="tableStore.newOrderTableIds.has(table.tableId)"
-        :is-owner="authStore.isOwner"
-        @click="handleTableClick(table.tableId, table.tableNumber)"
-        @end-session="handleEndSession(table.tableId)"
-        @show-history="handleShowHistory(table.tableId, table.tableNumber)"
-      />
-    </div>
-
-    <OrderDetailModal
-      :visible="showOrderDetail"
-      :table-id="selectedTableId"
-      :table-name="`#${selectedTableNumber}`"
-      @update:visible="showOrderDetail = $event"
-    />
-
-    <OrderHistoryPanel
-      :visible="showHistory"
-      :table-id="selectedTableId"
-      :table-number="selectedTableNumber"
-      @update:visible="showHistory = $event"
-    />
-
-    <TableSetupDialog :visible="showTableSetup" @update:visible="showTableSetup = $event" />
+    <OrderDetailModal v-if="selectedOrder" :order="selectedOrder" :visible="showDetail"
+                      @close="showDetail = false" />
+    <OrderHistoryModal v-if="showHistoryModal" :storeCode="auth.storeCode" :tableNo="historyTableId"
+                       :visible="showHistoryModal" @close="showHistoryModal = false" />
+    <ConfirmDialog v-if="confirmAction" :message="confirmMessage" @confirm="executeConfirm" @cancel="confirmAction = null" />
   </div>
 </template>
+
+<script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useAuthStore } from '../stores/authStore'
+import { useOrderStore } from '../stores/orderStore'
+import { tableService } from '../services/tableService'
+import TableCard from '../components/TableCard.vue'
+import OrderDetailModal from '../components/OrderDetailModal.vue'
+import OrderHistoryModal from '../components/OrderHistoryModal.vue'
+import ConfirmDialog from '../components/ConfirmDialog.vue'
+
+const auth = useAuthStore()
+const orderStore = useOrderStore()
+const selectedOrder = ref(null); const showDetail = ref(false)
+const showHistoryModal = ref(false); const historyTableId = ref(null)
+const confirmAction = ref(null); const confirmMessage = ref('')
+let pendingData = null
+
+function openDetail(order) { selectedOrder.value = order; showDetail.value = true }
+function openHistory(tableId) { historyTableId.value = tableId; showHistoryModal.value = true }
+
+function changeStatus(order) {
+  const next = order.status === 'pending' ? 'preparing' : 'completed'
+  confirmMessage.value = `주문 ${order.order_no}을 "${next === 'preparing' ? '준비중' : '완료'}"으로 변경하시겠습니까?`
+  confirmAction.value = 'changeStatus'; pendingData = { orderId: order.id, status: next }
+}
+
+function confirmDelete(order) {
+  confirmMessage.value = `주문 ${order.order_no}을 삭제하시겠습니까?`
+  confirmAction.value = 'delete'; pendingData = { orderId: order.id }
+}
+
+function confirmEndSession(tableId) {
+  confirmMessage.value = '이 테이블을 이용 완료 처리하시겠습니까?'
+  confirmAction.value = 'endSession'; pendingData = { tableNo: tableId }
+}
+
+async function executeConfirm() {
+  try {
+    if (confirmAction.value === 'changeStatus') await orderStore.updateStatus(pendingData.orderId, pendingData.status)
+    else if (confirmAction.value === 'delete') await orderStore.deleteOrder(pendingData.orderId)
+    else if (confirmAction.value === 'endSession') {
+      await tableService.endSession(auth.storeCode, pendingData.tableNo)
+      await orderStore.fetchOrders()
+    }
+  } catch (e) { alert(e.response?.data?.detail || '처리에 실패했습니다.') }
+  confirmAction.value = null; pendingData = null
+}
+
+onMounted(() => { orderStore.fetchOrders(); orderStore.connectSSE() })
+onUnmounted(() => { orderStore.disconnectSSE() })
+</script>
+
+<style scoped>
+.dashboard h1 { margin-bottom: 20px; font-size: 22px; }
+.loading, .empty { text-align: center; padding: 60px; color: #999; }
+.table-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+</style>

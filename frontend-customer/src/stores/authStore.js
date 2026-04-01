@@ -4,11 +4,9 @@ import { authService } from '../services/authService'
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: null,
-    storeId: null,
-    tableId: null,
-    sessionId: null,
     storeCode: null,
-    tableNo: null
+    tableNo: null,
+    sessionId: null
   }),
   getters: {
     isAuthenticated: (state) => !!state.token
@@ -17,18 +15,16 @@ export const useAuthStore = defineStore('auth', {
     async login(storeCode, tableNo, password) {
       const data = await authService.loginTable(storeCode, tableNo, password)
       this.token = data.access_token
-      this.storeId = data.table.store_id
-      this.tableId = data.table.id
+      this.storeCode = data.table.store_code
+      this.tableNo = data.table.table_no
       this.sessionId = data.table.session_id
-      this.storeCode = storeCode
-      this.tableNo = tableNo
       localStorage.setItem('token', data.access_token)
       return data
     },
     logout() {
       this.token = null
-      this.storeId = null
-      this.tableId = null
+      this.storeCode = null
+      this.tableNo = null
       this.sessionId = null
       localStorage.removeItem('token')
     },
@@ -39,6 +35,6 @@ export const useAuthStore = defineStore('auth', {
   persist: {
     key: 'auth',
     storage: localStorage,
-    pick: ['token', 'storeId', 'tableId', 'sessionId', 'storeCode', 'tableNo']
+    pick: ['token', 'storeCode', 'tableNo', 'sessionId']
   }
 })
