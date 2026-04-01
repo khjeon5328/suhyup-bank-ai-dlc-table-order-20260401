@@ -141,48 +141,73 @@
 
 ---
 
-## INCEPTION - Units Generation: Team Assignment
-**Timestamp**: 2026-04-01T00:27:00Z
-**User Input**: "국현이 3번, 수민이 4번, 지현이 1번, 소윤이 2번이야"
-**AI Response**: 담당자 배정 반영. Unit 1(database): 지현, Unit 2(backend): 소윤, Unit 3(frontend-customer): 국현, Unit 4(frontend-admin): 수민.
-**Context**: Units Generation - Team assignment updated
+## CONSTRUCTION - Functional Design (backend): Session Start
+**Timestamp**: 2026-04-01T01:00:00Z
+**User Input**: "나는 소윤이고 지금 나뉘어진 유닛 4개 중에 백엔드 유닛 개발을 할거야"
+**AI Response**: 세션 재개. 이전 아티팩트 로드 완료 (requirements.md, stories.md, personas.md, components.md, component-methods.md, services.md, application-design.md, unit-of-work.md, unit-of-work-dependency.md, unit-of-work-story-map.md). Backend 유닛 Functional Design 시작.
+**Context**: Construction Phase - Functional Design for Unit 2 (backend)
 
 ---
 
-## INCEPTION - Units Generation: User Approval
-**Timestamp**: 2026-04-01T00:28:00Z
-**User Input**: "응 이렇게 진행해줘"
-**AI Response**: Units Generation 승인 확인. CONSTRUCTION 단계 진행.
-**Context**: Units Generation - Approved, proceeding to CONSTRUCTION PHASE
+## CONSTRUCTION - Functional Design (backend): User Answers
+**Timestamp**: 2026-04-01T01:10:00Z
+**User Input**: "완료되었어" → Q3 미답변 발견 → "수정했어"
+**AI Response**: 12개 답변 확인 완료. Q1:A, Q2:A, Q3:C, Q4:B, Q5:A, Q6:A, Q7:C, Q8:C, Q9:C, Q10:B, Q11:B, Q12:A. 모순/모호성 없음. Functional Design 아티팩트 생성 진행.
+**Context**: Functional Design - Step 3~5 완료, Step 6~8 진행
 
 ---
 
-## CONSTRUCTION - Functional Design (Unit 1: database)
-**Timestamp**: 2026-04-01T00:29:00Z
-**AI Response**: Unit 1(database) Functional Design 수행. 8개 도메인 엔티티(Store, User, RestaurantTable, TableSession, Category, Menu, Order, OrderItem), 14개 비즈니스 규칙, Pydantic 스키마 구조, 시드 데이터 전략, DB 연결 설정, 마이그레이션 전략 정의.
-**Context**: Functional Design - Unit 1 database
+## CONSTRUCTION - Functional Design (backend): Approval
+**Timestamp**: 2026-04-01T01:20:00Z
+**User Input**: "please continue"
+**AI Response**: Functional Design 승인 확인. NFR Requirements 단계로 진행.
+**Context**: Functional Design - Step 9 approved, proceeding to NFR Requirements
 
 ---
 
-## CONSTRUCTION - Functional Design (Unit 3: frontend-customer) Start
-**Timestamp**: 2026-04-01T00:30:00Z
-**User Input**: "나는 국현인데 내가 수행해야 하는 유닛을 시작해줘" → "B" (Unit 3 먼저 시작)
-**AI Response**: Unit 3(frontend-customer) Functional Design 시작. 기존 API 스펙 기반으로 진행.
-**Context**: Functional Design - Unit 3 frontend-customer (담당: 국현)
+## CONSTRUCTION - NFR Requirements (backend): User Answers
+**Timestamp**: 2026-04-01T01:30:00Z
+**User Input**: "완료되었어. 혹시 Fast API 와 Django 차이가 뭐야?"
+**AI Response**: 10개 답변 확인 완료. Q1:A, Q2:A, Q3:A, Q4:A, Q5:A, Q6:C, Q7:A, Q8:B, Q9:A, Q10:A. 모순/모호성 없음. FastAPI vs Django 질문에 답변 제공. NFR 아티팩트 생성 진행.
+**Context**: NFR Requirements - Step 3~4 완료, Step 5~6 진행
 
 ---
 
-## CONSTRUCTION - Functional Design (Unit 3: frontend-customer)
-**Timestamp**: 2026-04-01T00:31:00Z
-**AI Response**: Unit 3(frontend-customer) Functional Design 수행. 11개 Vue 컴포넌트, 3개 Pinia 스토어(auth, cart, order), 7개 API 서비스, SSE 이벤트 처리, 10개 비즈니스 규칙, 사용자 흐름 다이어그램 정의.
-**Context**: Functional Design - Unit 3 frontend-customer (담당: 국현)
+## CONSTRUCTION - NFR Requirements (backend): Approval
+**Timestamp**: 2026-04-01T01:40:00Z
+**User Input**: "continue"
+**AI Response**: NFR Requirements 승인 확인. NFR Design 단계로 진행.
+**Context**: NFR Requirements - Step 7 approved, proceeding to NFR Design
 
 ---
 
-## CONSTRUCTION - NFR Requirements + NFR Design + Code Generation (Unit 3: frontend-customer)
-**Timestamp**: 2026-04-01T00:35:00Z
-**User Input**: "계속너가 최고의 선택을 해서 계속 진행해줘"
-**AI Response**: Functional Design 승인. NFR Requirements(9개 NFR, 보안 SECURITY-03/04/05/09/10/15 준수), NFR Design(보안/성능/가용성/에러핸들링 패턴), Code Generation(26개 소스 파일 + 4개 테스트 파일) 연속 완료.
-**Context**: Unit 3 frontend-customer - NFR Requirements → NFR Design → Code Generation 연속 실행
+## CONSTRUCTION - NFR Design (backend): User Answers
+**Timestamp**: 2026-04-01T01:50:00Z
+**User Input**: "Q3 답변 A로 바꿔줘" → "이대로 진행해저"
+**AI Response**: Q3을 A(인메모리 이벤트 버스)로 변경. 5개 답변 확인 완료. Q1:A, Q2:A, Q3:A, Q4:A, Q5:A. 모순/모호성 없음. NFR Design 아티팩트 생성 진행.
+**Context**: NFR Design - Step 3~4 완료, Step 5~6 진행
+
+---
+
+## CONSTRUCTION - NFR Design (backend): Approval
+**Timestamp**: 2026-04-01T02:00:00Z
+**User Input**: "계속 진행해줘"
+**AI Response**: NFR Design 승인 확인. Code Generation 단계로 진행.
+**Context**: NFR Design - Step 7 approved, proceeding to Code Generation
+
+---
+
+## CONSTRUCTION - Code Generation (backend): Plan Approval
+**Timestamp**: 2026-04-01T02:10:00Z
+**User Input**: "시작해줘!"
+**AI Response**: Code Generation 계획 승인 확인. Part 2 (Generation) 시작. Step 1부터 순차 실행.
+**Context**: Code Generation - Part 1 approved, Part 2 시작
+
+---
+
+## CONSTRUCTION - Code Generation (backend): Generation Complete
+**Timestamp**: 2026-04-01T02:30:00Z
+**AI Response**: Code Generation Part 2 완료. 11개 Step 전체 실행. 총 70+ 파일 생성 (설정 3, Core 8, Middleware 2, Models 11, Schemas 8, Repositories 10, Services 7, Routers 8, Tests 14, Docs 2).
+**Context**: Code Generation - Part 2 완료, 사용자 승인 대기
 
 ---
