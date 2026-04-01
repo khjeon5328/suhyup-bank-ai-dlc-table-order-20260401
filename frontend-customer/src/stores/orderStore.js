@@ -18,7 +18,7 @@ export const useOrderStore = defineStore('order', {
       this.isLoading = true
       try {
         const data = await orderService.createOrder(
-          authStore.storeId, authStore.tableId, authStore.sessionId, cartStore.items
+          authStore.storeId, cartStore.items
         )
         cartStore.clearCart()
         if (data.session_id) authStore.updateSessionId(data.session_id)
@@ -31,7 +31,7 @@ export const useOrderStore = defineStore('order', {
       const authStore = useAuthStore()
       this.isLoading = true
       try {
-        const data = await orderService.getOrders(authStore.storeId, authStore.sessionId, page)
+        const data = await orderService.getOrders(authStore.storeId, page)
         this.currentOrders = data
         return data
       } finally {
