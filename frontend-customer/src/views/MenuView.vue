@@ -2,6 +2,7 @@
   <div class="menu-page">
     <CategoryTabs :categories="categories" :activeId="activeCategory" @select="onCategorySelect" />
     <div v-if="isLoading" class="loading">메뉴를 불러오는 중...</div>
+    <div v-else-if="errorMsg" class="error-msg" data-testid="menu-error">{{ errorMsg }}</div>
     <div v-else class="menu-grid" data-testid="menu-grid">
       <MenuCard v-for="menu in filteredMenus" :key="menu.id" :menu="menu"
                 @click="openDetail(menu)" @add-to-cart="addToCart(menu)" />
@@ -31,6 +32,7 @@ const activeCategory = ref(null)
 const isLoading = ref(false)
 const selectedMenu = ref(null)
 const showDetail = ref(false)
+const errorMsg = ref('')
 
 const filteredMenus = computed(() => {
   if (!activeCategory.value) return menus.value
@@ -54,6 +56,8 @@ onMounted(async () => {
     ])
     categories.value = cats
     menus.value = menuList
+  } catch (err) {
+    errorMsg.value = '메뉴를 불러오지 못했습니다. 새로고침해 주세요.'
   } finally {
     isLoading.value = false
   }
@@ -64,5 +68,6 @@ onMounted(async () => {
 <style scoped>
 .menu-page { padding: 16px; }
 .loading { text-align: center; padding: 40px; color: #999; }
+.error-msg { text-align: center; padding: 40px; color: #f44336; }
 .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; padding-top: 12px; }
 </style>
