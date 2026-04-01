@@ -15,6 +15,7 @@
 | 항목 | 내용 |
 |------|------|
 | 이름 | `database` |
+| 담당자 | 지현 |
 | 기술 스택 | SQLAlchemy 모델 + Alembic 마이그레이션 + MySQL |
 | 배포 단위 | DB 마이그레이션 스크립트 |
 | 실행 순서 | 1번째 (모든 유닛의 기반) |
@@ -38,6 +39,7 @@
 | 항목 | 내용 |
 |------|------|
 | 이름 | `backend` |
+| 담당자 | 소윤 |
 | 기술 스택 | Python FastAPI + SQLAlchemy (async) |
 | 배포 단위 | 단일 FastAPI 서버 |
 | 실행 순서 | 2번째 (Unit 1의 모델/스키마 의존) |
@@ -66,6 +68,7 @@
 | 항목 | 내용 |
 |------|------|
 | 이름 | `frontend-customer` |
+| 담당자 | 국현 |
 | 기술 스택 | Vue.js 3 + Pinia + Vue Router |
 | 배포 단위 | 정적 SPA (CDN 또는 웹서버) |
 | 실행 순서 | 3번째 (Unit 2 API 의존) |
@@ -85,6 +88,7 @@
 | 항목 | 내용 |
 |------|------|
 | 이름 | `frontend-admin` |
+| 담당자 | 수민 |
 | 기술 스택 | Vue.js 3 + Pinia + Vue Router |
 | 배포 단위 | 정적 SPA (CDN 또는 웹서버) |
 | 실행 순서 | 4번째 (Unit 2 API 의존, Unit 3과 병렬 가능) |
