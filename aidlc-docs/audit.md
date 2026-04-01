@@ -140,3 +140,97 @@
 **Context**: Units Generation - Change requested and applied
 
 ---
+
+## Session Continuity - Return
+**Timestamp**: 2026-04-01T01:00:00Z
+**User Input**: "안녕"
+**AI Response**: 세션 연속성 확인. 기존 프로젝트 상태 로드 완료. CONSTRUCTION - Functional Design (Unit 1: backend) 단계 재개 준비.
+**Context**: Session resumption - All previous artifacts loaded (requirements, user stories, personas, application design, unit-of-work definitions)
+
+---
+
+## CONSTRUCTION - Functional Design Start (Unit 1: database)
+**Timestamp**: 2026-04-01T01:01:00Z
+**User Input**: "나는 unit1 담당자야"
+**AI Response**: Unit 1(database) 담당자 확인. database 유닛의 Functional Design 단계 시작. 계획 수립 및 질문 파일 생성 진행.
+**Context**: Functional Design - Step 1 (Analyze Unit Context) & Step 2 (Create Plan) & Step 3 (Generate Questions)
+
+---
+
+## CONSTRUCTION - Functional Design: User Answers (Unit 1: database)
+**Timestamp**: 2026-04-01T01:05:00Z
+**User Input**: "입력햇어" (질문 파일 답변 완료)
+**AI Response**: 답변 확인 완료. Q1:C(시간기반), Q2:B(소프트삭제), Q3:A(별도테이블), Q4:C(사용자정의코드PK), Q5:B(글로벌auto-increment), Q6:B(중간시드), Q7:B(선택적소프트삭제), Q8:A(단일이미지), Q9:A(기본타임스탬프), Q10:A(단순PIN). 모순 없음 확인. 아티팩트 생성 진행.
+**Context**: Functional Design - Step 5 (Collect and Analyze Answers) passed, proceeding to Step 6
+
+---
+
+## CONSTRUCTION - Functional Design: Approval (Unit 1: database)
+**Timestamp**: 2026-04-01T01:10:00Z
+**User Input**: "계속해조"
+**AI Response**: Functional Design 승인 확인. NFR Requirements 단계로 진행.
+**Context**: Functional Design - Step 9 (Approval received, updating state)
+
+---
+
+## CONSTRUCTION - NFR Requirements: User Answers (Unit 1: database)
+**Timestamp**: 2026-04-01T01:15:00Z
+**User Input**: "답변했어" (NFR 질문 파일 답변 완료)
+**AI Response**: 답변 확인 완료. Q1:A(utf8mb4), Q2:B(중규모풀), Q3:B(선택적TLS), Q4:A(수동마이그레이션), Q5:A(PythonEnum+MySQLENUM), Q6:B(테스트용MySQL), Q7:A(passlib). 모순 없음 확인. 아티팩트 생성 진행.
+**Context**: NFR Requirements - Step 5 passed, proceeding to Step 6
+
+---
+
+## CONSTRUCTION - NFR Requirements: Approval (Unit 1: database)
+**Timestamp**: 2026-04-01T01:20:00Z
+**User Input**: "계속해줘"
+**AI Response**: NFR Requirements 승인 확인. NFR Design 단계로 진행.
+**Context**: NFR Requirements - Step 9 (Approval received, updating state)
+
+---
+
+## CONSTRUCTION - NFR Design: User Answers (Unit 1: database)
+**Timestamp**: 2026-04-01T01:25:00Z
+**User Input**: "됐어" (NFR Design 질문 파일 답변 완료)
+**AI Response**: 답변 확인 완료. Q1:A(Repository패턴), Q2:A(TimestampMixin), Q3:A(SoftDeleteMixin+자동필터), Q4:A(PydanticSettings). 모순 없음 확인. 아티팩트 생성 진행.
+**Context**: NFR Design - Step 5 passed, proceeding to Step 6
+
+---
+
+## CONSTRUCTION - NFR Design: Approval (Unit 1: database)
+**Timestamp**: 2026-04-01T01:30:00Z
+**User Input**: "됐어"
+**AI Response**: NFR Design 승인 확인. Code Generation 단계로 진행.
+**Context**: NFR Design - Step 9 (Approval received, updating state)
+
+---
+
+## CONSTRUCTION - Code Generation: Plan Created (Unit 1: database)
+**Timestamp**: 2026-04-01T01:31:00Z
+**AI Response**: Code Generation 계획 수립 완료. 10개 단계, 총 약 45개 파일 생성 예정. 사용자 승인 요청.
+**Context**: Code Generation - Part 1 (Planning) Steps 1-6 complete
+
+---
+
+## CONSTRUCTION - Code Generation: Plan Approved (Unit 1: database)
+**Timestamp**: 2026-04-01T01:35:00Z
+**User Input**: "응"
+**AI Response**: Code Generation 계획 승인 확인. Part 2 (Generation) 시작.
+**Context**: Code Generation - Part 1 approved, proceeding to Part 2
+
+---
+
+## CONSTRUCTION - Code Generation: Complete (Unit 1: database)
+**Timestamp**: 2026-04-01T01:45:00Z
+**AI Response**: Code Generation 완료. 10단계 모두 실행, 약 43개 파일 생성. 모델 8개, 스키마 10개, Repository 8개, 테스트 4개 파일, 마이그레이션, 시드 데이터 포함.
+**Context**: Code Generation - Part 2 (Generation) Steps 10-14 complete
+
+---
+
+## CONSTRUCTION - Code Generation: Approval (Unit 1: database)
+**Timestamp**: 2026-04-01T01:50:00Z
+**User Input**: "계속행"
+**AI Response**: Code Generation 승인 확인. Unit 1(database) CONSTRUCTION 전체 완료. aidlc-state.md 업데이트.
+**Context**: Code Generation - Step 16 (Approval received, updating state). Unit 1 all construction stages complete.
+
+---
